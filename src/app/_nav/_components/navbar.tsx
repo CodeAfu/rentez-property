@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes } from "@/types/navigation";
 import Auth from "@/app/_auth/_components/auth";
 import NavButton from "./nav-button";

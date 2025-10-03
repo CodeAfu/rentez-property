@@ -44,7 +44,7 @@ export default function RootLayout({
         >
           <Navbar />
           {children}
-          {process.env.NODE_ENV === "development" && <ToggleTheme />}
+          <ToggleTheme />
         </ThemeProvider>
       </body>
     </html>
