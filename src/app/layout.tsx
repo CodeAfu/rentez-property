@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/theme-provider";
-import Navbar from "@/components/navbar";
 import { cn } from "@/lib/utils";
 import { Space_Grotesk, Merriweather } from "next/font/google";
 
 import "./globals.css";
+import { ToggleTheme } from "@/components/toggle-theme";
+import Navbar from "./_nav/_components/navbar";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({
         >
           <Navbar />
           {children}
+          {process.env.NODE_ENV === "development" && <ToggleTheme />}
         </ThemeProvider>
       </body>
     </html>

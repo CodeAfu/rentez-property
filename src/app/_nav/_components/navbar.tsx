@@ -1,8 +1,7 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Routes } from "@/types/navigation";
-import Link from "next/link";
-import Auth from "@/components/auth";
+import Auth from "@/app/_auth/_components/auth";
+import NavButton from "./nav-button";
 
 const routes: Routes = [
   {
@@ -19,19 +18,14 @@ export default function Navbar() {
   return (
     <nav className="sticky flex items-center justify-between h-16 bg-sidebar">
       <div className="flex h-full items-center">
-        <div className="px-4">ICON</div>
+        <div className="px-4 text-sm">RentEZ Property</div>
         {routes.map((route) => (
-          <Button
-            asChild
-            key={route.href}
-            variant="ghost"
-            className="h-full rounded-none font-semibold"
-          >
-            <Link href={route.href}>{route.label}</Link>
-          </Button>
+          <NavButton key={route.href} route={route} />
         ))}
       </div>
-      <Auth />
+      <div className="flex gap-4 items-center">
+        <Auth />
+      </div>
     </nav>
   );
 }

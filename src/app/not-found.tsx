@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="text-lg">Could not find requested resource</p>
         <Link
           href="/"
-          className="text-primary-foreground underline-offset-2 hover:underline hover:text-primary-foreground-lighter transition duration-200"
+          className="text-primary underline-offset-2 hover:underline hover:text-primary-foreground-lighter transition duration-200"
         >
           Return Home
         </Link>
