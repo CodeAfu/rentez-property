@@ -47,7 +47,7 @@ export default function Login() {
               </div>
               <div>
                 <label className="ml-1 select-none text-sm">Password:</label>
-                <Input placeholder="Enter password" />
+                <Input type="password" placeholder="Enter password" />
               </div>
             </div>
             <Button onClick={handleClick}>Login</Button>

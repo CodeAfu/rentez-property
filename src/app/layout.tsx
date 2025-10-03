@@ -6,6 +6,7 @@ import { Space_Grotesk, Merriweather } from "next/font/google";
 import "./globals.css";
 import { ToggleTheme } from "@/components/toggle-theme";
 import Navbar from "./_nav/_components/navbar";
+import Footer from "./_components/footer";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -19,7 +20,7 @@ const merriweather = Merriweather({
 
 export const metadata: Metadata = {
   title: "RentEZ Property",
-  description: "Rent Property EZ",
+  description: "Simplifying property management for landlords and tenants.",
 };
 
 export default function RootLayout({
@@ -44,6 +45,7 @@ export default function RootLayout({
         >
           <Navbar />
           {children}
+          <Footer />
           <ToggleTheme />
         </ThemeProvider>
       </body>
