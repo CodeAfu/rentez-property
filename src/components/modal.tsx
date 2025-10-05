@@ -50,7 +50,7 @@ export default function Modal({
           <div
             id="modal-body"
             className={cn(
-              "fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] bg-card min-h-32 text-card-foreground flex flex-col rounded shadow w-xl",
+              "fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] bg-card min-h-32 text-card-foreground flex flex-col rounded shadow w-full max-w-xl",
               "opacity-0 animate-[fadeIn_150ms_ease-out_forwards]",
               className
             )}

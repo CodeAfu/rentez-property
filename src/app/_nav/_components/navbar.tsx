@@ -21,7 +21,7 @@ const routes: Routes = [
 
 export default function Navbar() {
   return (
-    <nav className="sticky flex items-center justify-between h-16 bg-sidebar">
+    <nav className="sticky flex items-center justify-between h-16 bg-sidebar overflow-hidden">
       <div className="flex h-full items-center">
         <Link href="/" className="block px-4 flex-shrink-0">
           <Image
