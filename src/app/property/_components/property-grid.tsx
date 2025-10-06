@@ -20,6 +20,41 @@ export default function PropertyGrid() {
       <GridCard />
       <GridCard />
       <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
+      <GridCard />
     </div>
   );
 }

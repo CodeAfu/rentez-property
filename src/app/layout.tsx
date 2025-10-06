@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "@/theme-provider";
 import { cn } from "@/lib/utils";
 import { Space_Grotesk, Merriweather } from "next/font/google";
 
@@ -7,6 +6,7 @@ import "./globals.css";
 import { ToggleTheme } from "@/components/toggle-theme";
 import Navbar from "./_nav/_components/navbar";
 import Footer from "./_components/footer";
+import Providers from "@/providers/providers";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -37,17 +37,12 @@ export default function RootLayout({
           merriweather.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <Providers>
           <Navbar />
           {children}
           <Footer />
           <ToggleTheme />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
