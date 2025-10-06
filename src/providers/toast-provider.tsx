@@ -1,21 +1,18 @@
 "use client";
-import { createContext, useContext, useState, ReactNode } from "react";
+import Toast from "@/components/toast";
+import { ToastType } from "@/types/toast";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { createPortal } from "react-dom";
 import { v4 as uuidv4 } from "uuid";
 
-type Type = "info" | "warning" | "error" | "log";
-
-interface Toast {
-  id: string;
-  message: string;
-  type: Type;
-  timeout?: number;
-}
-
 interface ToastContextType {
-  toasts: Toast[];
-  addToast: (toast: Omit<Toast, "id">) => void;
-  removeToast: (id: string) => void;
+  toast: (toast: Omit<ToastType, "id">) => void;
 }
 
 interface ToastProviderProps {
@@ -27,21 +24,22 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export default function ToastProvider({
   children,
-  timeout = 3000,
+  timeout = 5000,
 }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [toasts, setToasts] = useState<Required<ToastType>[]>([]);
+  const [mounted, setMounted] = useState(false);
 
-  const addToast = ({
-    message,
-    type,
-    timeout: customTimeout,
-  }: Omit<Toast, "id">) => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toast = ({ type = "info", title, message }: Omit<ToastType, "id">) => {
     const id = uuidv4();
     setToasts((prevState) => [
-      { id, message, type, timeout: customTimeout },
+      { id, type, title, message, timeout },
       ...prevState,
     ]);
-    const expireTime = customTimeout || timeout;
+    const expireTime = timeout;
     setTimeout(() => removeToast(id), expireTime);
   };
 
@@ -50,19 +48,22 @@ export default function ToastProvider({
   };
 
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+    <ToastContext.Provider value={{ toast }}>
       {children}
-      {createPortal(
-        // Change to Toast Component
-        <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
-          {toasts.map((toast) => (
-            <div key={toast.id} className="bg-white p-4 rounded shadow-lg">
-              {toast.message}
-            </div>
-          ))}
-        </div>,
-        document.body
-      )}
+      {mounted &&
+        createPortal(
+          <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+            {toasts.map((toast) => (
+              <Toast
+                key={toast.id}
+                title={toast.title}
+                type={toast.type}
+                message={toast.message}
+              />
+            ))}
+          </div>,
+          document.body
+        )}
     </ToastContext.Provider>
   );
 }

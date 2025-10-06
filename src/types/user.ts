@@ -8,6 +8,7 @@ export const userSchema = z.object({
   occupation: z.string().max(100),
   ethnicity: z.string().max(50),
   email_address: z.email(),
+  phone_number: z.string(),
   password_hash: z.string().max(255),
   created_at: z.date(),
   updated_at: z.date(),

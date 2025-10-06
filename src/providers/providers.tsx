@@ -1,7 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ThemeProvider } from "./theme-provider";
+import ThemeProvider from "./theme-provider";
+import ToastProvider from "./toast-provider";
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
@@ -11,7 +12,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {children}
+      <ToastProvider timeout={60000}>{children}</ToastProvider>
     </ThemeProvider>
   );
 }

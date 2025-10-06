@@ -1,10 +1,30 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { MouseEvent } from "react";
 import Image from "next/image";
+import { useToast } from "@/providers/toast-provider";
 
 export default function GridCard() {
+  const { toast } = useToast();
+
+  const handleClipboardCopy = async (e: MouseEvent<HTMLButtonElement>) => {
+    const text = e.currentTarget.textContent;
+    try {
+      await navigator.clipboard.writeText(text || "");
+      toast({
+        title: "Copy",
+        message: "Phone number copied to clipboard.",
+      });
+    } catch (err) {
+      toast({
+        type: "error",
+        title: "Failed to copy to clipboard.",
+        message: `Error: ${err}`,
+      });
+    }
+  };
+
   return (
     <div
       className="group h-64 bg-gray-400 dark:bg-gray-600 overflow-hidden rounded
@@ -38,7 +58,7 @@ export default function GridCard() {
             Leong Kai Foong
           </p>
           <button
-            onClick={() => {}}
+            onClick={(e) => handleClipboardCopy(e)}
             className="text-sm p-0 m-0 whitespace-nowrap overflow-hidden
                         hover:cursor-pointer hover:underline hover:text-accent"
           >
@@ -46,7 +66,7 @@ export default function GridCard() {
           </button>
         </div>
         <div className="flex h-full items-end justify-end py-1">
-          <Button variant="outline" className="h-full">
+          <Button onClick={() => {}} variant="outline" className="h-full">
             View
           </Button>
         </div>
