@@ -1,5 +1,6 @@
 import React from "react";
 
 export default function PropertyListing() {
-  return <div className="min-h-screen">PropertyListing</div>;
+  return <div className="min-h-screen">PropertyListing2222</div>;
+  
 }
