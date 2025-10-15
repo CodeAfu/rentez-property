@@ -10,4 +10,4 @@ type Failure<E> = {
   message?: string;
 };
 
-export type Result<T, E = Error> = Success<T> | Failure<E>;
+export type ApiResponse<T, E = Error> = Success<T> | Failure<E>;
