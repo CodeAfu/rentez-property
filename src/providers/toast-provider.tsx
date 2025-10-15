@@ -25,6 +25,15 @@ interface ToastWithState extends Required<ToastType> {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+/**
+ * Provides a ToastContext and renders toast notifications in a top-right portal.
+ *
+ * The provider supplies a `toast` function via context that enqueues toasts; enqueued toasts are shown in a fixed top-right container and are removed after their timeout with an exit animation.
+ *
+ * @param children - React children to render within the provider
+ * @param timeout - Default duration in milliseconds before a toast begins exiting (default: 5000)
+ * @returns The ToastProvider element that wraps children and the toast portal
+ */
 export default function ToastProvider({
   children,
   timeout = 5000,

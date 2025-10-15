@@ -1,5 +1,14 @@
 import React from 'react';
 
+/**
+ * Render a visual showcase of the library's main color tokens and related UI examples.
+ *
+ * The component displays token cards for background, card, popover, primary, secondary, muted,
+ * accent, and destructive colors, plus a border showcase, interactive themed buttons, and a
+ * card example with an overlaid popover. The component is static and accepts no props.
+ *
+ * @returns A JSX element containing the full-page color variables showcase.
+ */
 export default function ColorShowcase() {
   return (
     <div className="min-h-screen bg-background p-8">

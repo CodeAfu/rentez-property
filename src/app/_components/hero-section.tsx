@@ -1,6 +1,14 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 
+/**
+ * Hero section that displays a centered title and two primary action buttons.
+ *
+ * Renders a full-width centered container with the heading "RentEZ Property" and a pair
+ * of large buttons for "Search for Property" (outline variant) and "Rent a Room".
+ *
+ * @returns A React element containing the hero heading and the two action buttons.
+ */
 export default function HeroSection() {
   return (
     <div className="relative min-h-128 flex flex-col bg-primary/20 mb-4 items-center justify-center">

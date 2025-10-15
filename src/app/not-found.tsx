@@ -1,6 +1,11 @@
 import Link from "next/link";
 import React from "react";
 
+/**
+ * Render a centered "Not Found" page with a message and a link back to the homepage.
+ *
+ * @returns The JSX element for a full-height, centered not-found view containing a heading, message, and "Return Home" link
+ */
 export default function NotFound() {
   return (
     <main className="h-[calc(100dvh-4rem)] flex flex-col items-center justify-center">

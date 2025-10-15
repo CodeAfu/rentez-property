@@ -6,6 +6,13 @@ import Image from "next/image";
 import { useToast } from "@/providers/toast-provider";
 import Link from "next/link";
 
+/**
+ * Renders a responsive card with an image, title, author, contact and a call-to-action button.
+ *
+ * The contact phone number can be clicked to copy it to the clipboard and display a toast notification.
+ *
+ * @returns The rendered GridCard JSX element.
+ */
 export default function GridCard() {
   const { toast } = useToast();
 

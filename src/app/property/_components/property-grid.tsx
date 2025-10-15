@@ -6,7 +6,11 @@ import GridCard from "./grid-card";
 // const data = [
 //   {
 //   }
-// ]
+/**
+ * Render a centered vertical stack of property cards with responsive spacing.
+ *
+ * @returns A JSX element containing ten `GridCard` components arranged in a centered column with responsive gaps.
+ */
 
 export default function PropertyGrid() {
   return (

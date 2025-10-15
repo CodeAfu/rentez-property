@@ -15,6 +15,17 @@ interface ToastProps extends HTMLAttributes<HTMLDivElement> {
   isExiting?: boolean;
 }
 
+/**
+ * Renders a toast UI element that displays an icon for the message type, an optional title, and a message.
+ *
+ * @param title - Optional heading shown above the message
+ * @param message - The main text content of the toast
+ * @param type - The toast message type which selects the icon (e.g., "info", "warning", "error", "log")
+ * @param className - Optional additional CSS class names applied to the root element
+ * @param isExiting - When true, applies the exit animation class; otherwise applies the enter animation class
+ * @param props - Additional HTML attributes forwarded to the root div
+ * @returns The rendered toast element
+ */
 export default function Toast({
   title,
   message,

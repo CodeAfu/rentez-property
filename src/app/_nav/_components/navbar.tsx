@@ -25,6 +25,13 @@ const routes: Routes = [
   },
 ];
 
+/**
+ * Render the top navigation bar containing the logo, route buttons, and authentication controls.
+ *
+ * Navigation buttons include routes marked `devOnly` only when `process.env.NODE_ENV` equals `"development"`.
+ *
+ * @returns The navbar as a JSX element
+ */
 export default function Navbar() {
   const visibleRoutes = routes.filter(
     (route) => !route.devOnly || process.env.NODE_ENV == "development"
