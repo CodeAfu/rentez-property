@@ -10,8 +10,8 @@ import GridCard from "./grid-card";
 
 export default function PropertyGrid() {
   return (
-    <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4">
-      {Array.from({ length: 1 }).map((_, i) => (
+    <div className="flex flex-col items-center xl:gap-12 gap-4">
+      {Array.from({ length: 10 }).map((_, i) => (
         <GridCard key={i} />
       ))}
     </div>

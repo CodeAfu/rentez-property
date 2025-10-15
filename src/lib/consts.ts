@@ -1,0 +1,2 @@
+export const TOAST_EXIT_ANIMATION_DURATION = 200; // ms
+export const TOAST_ENTRY_ANIMATION_DURATION = 300; // ms

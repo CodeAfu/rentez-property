@@ -1,5 +1,6 @@
 "use client";
 import Toast from "@/components/toast";
+import { TOAST_EXIT_ANIMATION_DURATION } from "@/lib/consts";
 import { ToastType } from "@/types/toast";
 import {
   createContext,
@@ -10,14 +11,16 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { v4 as uuidv4 } from "uuid";
-
 interface ToastContextType {
   toast: (toast: Omit<ToastType, "id">) => void;
 }
-
 interface ToastProviderProps {
   children: ReactNode;
   timeout?: number;
+}
+
+interface ToastWithState extends Required<ToastType> {
+  isExiting: boolean;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -26,7 +29,7 @@ export default function ToastProvider({
   children,
   timeout = 5000,
 }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<Required<ToastType>[]>([]);
+  const [toasts, setToasts] = useState<Required<ToastWithState>[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -36,15 +39,24 @@ export default function ToastProvider({
   const toast = ({ type = "info", title, message }: Omit<ToastType, "id">) => {
     const id = uuidv4();
     setToasts((prevState) => [
-      { id, type, title, message, timeout },
+      { id, type, title, message, timeout, isExiting: false },
       ...prevState,
     ]);
-    const expireTime = timeout;
-    setTimeout(() => removeToast(id), expireTime);
+
+    setTimeout(() => removeToast(id), timeout);
   };
 
   const removeToast = (id: string) => {
-    setToasts((prevState) => prevState.filter((toast) => toast.id !== id));
+    // Trigger exit animation
+    setToasts((prevState) =>
+      prevState.map((toast) =>
+        toast.id === id ? { ...toast, isExiting: true } : toast
+      )
+    );
+    // Remove from state after animation completes
+    setTimeout(() => {
+      setToasts((prevState) => prevState.filter((toast) => toast.id !== id));
+    }, TOAST_EXIT_ANIMATION_DURATION - 5);
   };
 
   return (
@@ -59,6 +71,7 @@ export default function ToastProvider({
                 title={toast.title}
                 type={toast.type}
                 message={toast.message}
+                isExiting={toast.isExiting}
               />
             ))}
           </div>,
