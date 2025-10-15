@@ -1,12 +1,18 @@
 import { cn } from "@/lib/utils";
 import { ToastMessageType } from "@/types/toast";
-import { AlertTriangle, CircleX, FileText, Info } from "lucide-react";
+import { AlertTriangle, CircleX, FileText, Info, X } from "lucide-react";
 import React, { HTMLAttributes } from "react";
+import { Button } from "./ui/button";
+import {
+  TOAST_ENTRY_ANIMATION_DURATION,
+  TOAST_EXIT_ANIMATION_DURATION,
+} from "@/lib/consts";
 
 interface ToastProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
   message: string;
   type: ToastMessageType;
+  isExiting?: boolean;
 }
 
 export default function Toast({
@@ -14,12 +20,14 @@ export default function Toast({
   message,
   type,
   className,
+  isExiting = false,
   ...props
 }: ToastProps) {
   return (
     <div
       className={cn(
-        "relative w-sm opacity-90 font-mono bg-secondary text-secondary-foreground stroke-secondary-foreground shadow-lg p-2 rounded text-sm flex gap-2",
+        "relative md:w-sm w-64 opacity-90 font-mono bg-secondary text-secondary-foreground stroke-secondary-foreground shadow-lg p-2 rounded text-sm flex gap-2",
+        isExiting ? "animate-toast-exit" : "animate-toast-enter",
         className
       )}
       {...props}
@@ -35,6 +43,9 @@ export default function Toast({
         )}
         <p className="break-words">{message}</p>
       </div>
+      {/* <Button onClick={} variant="ghost"> */}
+      {/* <X /> */}
+      {/* </Button> */}
     </div>
   );
 }

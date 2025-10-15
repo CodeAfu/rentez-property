@@ -16,12 +16,21 @@ const routes: Routes = [
   {
     label: "Not Found",
     href: "/this-link-does-not-exist-for-sure",
+    devOnly: true,
+  },
+  {
+    label: "Adjust Theme",
+    href: "/adjust-theme",
+    devOnly: true,
   },
 ];
 
 export default function Navbar() {
+  const visibleRoutes = routes.filter(
+    (route) => !route.devOnly || process.env.NODE_ENV == "development"
+  );
   return (
-    <nav className="sticky flex items-center justify-between h-16 bg-sidebar overflow-hidden">
+    <nav className="sticky flex items-center justify-between h-16 bg-card shadow-sm overflow-hidden">
       <div className="flex h-full items-center">
         <Link href="/" className="block px-4 flex-shrink-0">
           <Image
@@ -33,7 +42,7 @@ export default function Navbar() {
           />
         </Link>
 
-        {routes.map((route) => (
+        {visibleRoutes.map((route) => (
           <NavButton key={route.href} route={route} />
         ))}
       </div>

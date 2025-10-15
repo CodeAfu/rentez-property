@@ -1,13 +1,11 @@
 type Success<T> = {
-  status: number;
+  success: boolean;
   data: T;
-  error: null;
   message?: string;
 };
 
 type Failure<E> = {
-  status: number;
-  data: null;
+  success: boolean;
   error: E;
   message?: string;
 };

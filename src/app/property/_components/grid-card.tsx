@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import React, { MouseEvent } from "react";
 import Image from "next/image";
 import { useToast } from "@/providers/toast-provider";
+import Link from "next/link";
 
 export default function GridCard() {
   const { toast } = useToast();
@@ -14,7 +15,7 @@ export default function GridCard() {
       await navigator.clipboard.writeText(text || "");
       toast({
         title: "Copy",
-        message: "Phone number copied to clipboard.",
+        message: `${text} - Copied to clipboard.`,
       });
     } catch (err) {
       toast({
@@ -27,8 +28,9 @@ export default function GridCard() {
 
   return (
     <div
-      className="group h-64 bg-gray-400 dark:bg-gray-600 overflow-hidden rounded
-                  grid grid-rows-1 [grid-template-areas:'stack'] items-end"
+      className="group aspect-video bg-gray-400 dark:bg-gray-600 overflow-hidden rounded
+                  grid grid-rows-1 [grid-template-areas:'stack'] items-end
+                  w-full max-w-sm md:max-w-3xl xl:max-w-7xl"
     >
       <div
         style={{ gridArea: "stack" }}
@@ -39,34 +41,39 @@ export default function GridCard() {
           <Image
             src="/assets/rentez-logo.svg"
             alt="Image"
-            width="300"
-            height="300"
+            width="800"
+            height="600"
             className="max-h-full w-full object-cover"
           />
         </div>
       </div>
       <div
         style={{ gridArea: "stack" }}
-        className="h-18 px-2 bg-black/40 backdrop-blur-sm overflow-hidden flex justify-between gap-1
-                    translate-y-0 xl:translate-y-18 group-hover:translate-y-0 transition duration-300"
+        className="md:h-26 h-20 p-2 bg-black/40 backdrop-blur-sm overflow-hidden flex justify-between gap-1
+                    translate-y-0 xl:translate-y-full group-hover:translate-y-0 transition duration-300"
       >
-        <div className="text-gray-100">
-          <p className="font-semibold whitespace-nowrap overflow-hidden">
-            Water Park
-          </p>
-          <p className="text-sm whitespace-nowrap overflow-hidden">
-            Leong Kai Foong
-          </p>
-          <button
-            onClick={(e) => handleClipboardCopy(e)}
-            className="text-sm p-0 m-0 whitespace-nowrap overflow-hidden
-                        hover:cursor-pointer hover:underline hover:text-accent"
+        <div className="text-gray-100 flex flex-col justify-between">
+          <Link
+            href="#"
+            className="md:text-2xl text-sm font-semibold whitespace-nowrap overflow-hidden active:underline hover:underline hover:text-accent transition duration-200"
           >
-            +60-12-345-6789
-          </button>
+            Water Park
+          </Link>
+          <div className="space-y-0">
+            <p className="text-xs p-0 md:text-sm whitespace-nowrap overflow-hidden leading-none">
+              Leong Kai Foong
+            </p>
+            <button
+              onClick={(e) => handleClipboardCopy(e)}
+              className="text-xs md:text-sm p-0 m-0 whitespace-nowrap overflow-hidden leading-none -mt-1
+               hover:cursor-pointer hover:underline hover:text-accent"
+            >
+              +60-12-345-6789
+            </button>
+          </div>
         </div>
         <div className="flex h-full items-end justify-end py-1">
-          <Button onClick={() => {}} variant="outline" className="h-full">
+          <Button onClick={() => {}} variant="outline" className="h-full px-8">
             View
           </Button>
         </div>

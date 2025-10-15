@@ -12,7 +12,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <ToastProvider timeout={60000}>{children}</ToastProvider>
+      <ToastProvider timeout={3000}>{children}</ToastProvider>
     </ThemeProvider>
   );
 }
