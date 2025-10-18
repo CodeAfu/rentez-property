@@ -5,15 +5,15 @@ import { DocusealForm } from "@docuseal/react";
 import LoadingSpinner from "@/components/loading-spinner";
 import { cn } from "@/lib/utils";
 
-interface DocusealComponentProps {
+interface DocumentView {
   src?: string; // TODO: remove optional
   email?: string;
 }
 
-export default function DocusealComponent({
+export default function DocumentView({
   src = "https://docuseal.com/d/LEVGR9rhZYf86M", // pass template here
   email = "example@gmail.com",
-}: DocusealComponentProps) {
+}: DocumentView) {
   const [isLoading, setIsLoading] = useState(true);
 
   return (

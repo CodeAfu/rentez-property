@@ -19,11 +19,6 @@ const routes: Routes = [
     devOnly: true,
   },
   {
-    label: "Adjust Theme",
-    href: "/adjust-theme",
-    devOnly: true,
-  },
-  {
     label: "Test Stuff",
     href: "/test-components",
     devOnly: true,

@@ -1,0 +1,28 @@
+"use client";
+
+import { ReactNode, useState } from "react";
+
+export default function ComponentDisplay({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  console.log(isOpen);
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="px-8 py-4 my-4 rounded cursor-pointer bg-card mb-2 font-bold shadow
+                  flex w-full items-center justify-between
+                  hover:bg-accent hover:text-accent-foreground transition duration-200"
+      >
+        <span className="text-xl">{title}</span>
+        <span className="text-2xl font-light">{isOpen ? "-" : "+"}</span>
+      </button>
+      {isOpen && children}
+    </div>
+  );
+}
