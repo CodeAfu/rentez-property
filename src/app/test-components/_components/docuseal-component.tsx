@@ -17,13 +17,7 @@ export default function DocusealComponent({
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <div
-      style={{
-        scrollbarWidth: "thin",
-        scrollbarColor: "#888 #f1f1f1",
-      }}
-      className="relative max-w-6xl mx-auto bg-slate-200 h-[calc(100dvh-4rem)] rounded overflow-auto p-2 border border-border"
-    >
+    <div className="relative max-w-6xl mx-auto bg-slate-200 h-[calc(100dvh-4rem)] rounded overflow-auto p-2 border border-border scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
       {isLoading && <LoadingSpinner />}
       <div
         className={cn(
