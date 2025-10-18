@@ -15,7 +15,7 @@ export default function TestPage() {
       <ComponentDisplay title="DocuSeal Document View">
         <DocumentView />
       </ComponentDisplay>
-      <ComponentDisplay title="DocuSeal Document Submit">
+      <ComponentDisplay display={true} title="DocuSeal Document Submit">
         <DocumentSubmit />
       </ComponentDisplay>
     </div>
