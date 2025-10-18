@@ -17,7 +17,7 @@ export function ToggleTheme() {
   const left = process.env.NODE_ENV === "development" ? "left-16" : "left-5";
 
   return (
-    <div className={`fixed bottom-5 ${left}`}>
+    <div className={`fixed bottom-5 ${left} z-200`}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon">

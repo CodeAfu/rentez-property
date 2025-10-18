@@ -41,15 +41,15 @@ export default function GridCard() {
           <Image
             src="/assets/rentez-logo.svg"
             alt="Image"
-            width="800"
-            height="600"
+            width={800}
+            height={600}
             className="max-h-full w-full object-cover"
           />
         </div>
       </div>
       <div
         style={{ gridArea: "stack" }}
-        className="md:h-26 h-20 p-2 bg-black/40 backdrop-blur-sm overflow-hidden flex justify-between gap-1
+        className="md:h-24 h-20 p-2 bg-black/40 backdrop-blur-sm overflow-hidden flex justify-between gap-1
                     translate-y-0 xl:translate-y-full group-hover:translate-y-0 transition duration-300"
       >
         <div className="text-gray-100 flex flex-col justify-between">

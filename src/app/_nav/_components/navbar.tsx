@@ -23,11 +23,16 @@ const routes: Routes = [
     href: "/adjust-theme",
     devOnly: true,
   },
+  {
+    label: "Test Stuff",
+    href: "/test-components",
+    devOnly: true,
+  },
 ];
 
 export default function Navbar() {
   const visibleRoutes = routes.filter(
-    (route) => !route.devOnly || process.env.NODE_ENV == "development"
+    (route) => !route.devOnly || process.env.NODE_ENV === "development"
   );
   return (
     <nav className="sticky flex items-center justify-between h-16 bg-card shadow-sm overflow-hidden">
