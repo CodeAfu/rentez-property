@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import React from "react";
 import DocumentView from "./_components/document-view";
-import DocumentSubmit from "./_components/document.submit";
+import DocumentSubmit from "./_components/document-submit";
 import ComponentDisplay from "./_components/component-display";
 import ColorShowcase from "@/components/color-showcase";
 
