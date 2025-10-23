@@ -14,13 +14,13 @@ const routes: Routes = [
     href: "/property",
   },
   {
-    label: "Not Found",
-    href: "/this-link-does-not-exist-for-sure",
-    devOnly: true,
-  },
-  {
     label: "Test Stuff",
     href: "/test-components",
+    // devOnly: true,
+  },
+  {
+    label: "Not Found",
+    href: "/this-link-does-not-exist-for-sure",
     devOnly: true,
   },
 ];
