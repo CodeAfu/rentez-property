@@ -14,7 +14,6 @@ export default function ComponentDisplay({
   children,
 }: ComponentDisplayProps) {
   const [isOpen, setIsOpen] = useState(display);
-  console.log(isOpen);
   return (
     <div>
       <button
