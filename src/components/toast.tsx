@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
 import { ToastMessageType } from "@/types/toast";
-import { AlertTriangle, CircleX, FileText, Info, X } from "lucide-react";
+import { AlertTriangle, CircleX, FileText, Info } from "lucide-react";
 import React, { HTMLAttributes } from "react";
-import { Button } from "./ui/button";
-import {
-  TOAST_ENTRY_ANIMATION_DURATION,
-  TOAST_EXIT_ANIMATION_DURATION,
-} from "@/lib/consts";
+// import { Button } from "./ui/button";
+// import {
+//   TOAST_ENTRY_ANIMATION_DURATION,
+//   TOAST_EXIT_ANIMATION_DURATION,
+// } from "@/lib/consts";
 
 interface ToastProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;

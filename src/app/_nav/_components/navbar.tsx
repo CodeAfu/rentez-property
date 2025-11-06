@@ -14,6 +14,10 @@ const routes: Routes = [
     href: "/property",
   },
   {
+    label: "Landlord",
+    href: "/user/landlord"
+  },
+  {
     label: "Test Stuff",
     href: "/test-components",
     // devOnly: true,
