@@ -4,14 +4,11 @@ import Modal from "@/components/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
+import Link from "next/link";
 import { MouseEvent, Fragment, useState } from "react";
 
 export default function Login() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleModal = () => {
-    setIsModalOpen(true);
-  };
 
   const handleClick = (e: MouseEvent) => {
     e.preventDefault();
@@ -19,8 +16,8 @@ export default function Login() {
 
   return (
     <Fragment>
-      <Button size="sm" variant="outline" onClick={handleModal}>
-        Login
+      <Button size="sm" variant="outline" asChild>
+        <Link href="/auth/login">Login</Link>
       </Button>
 
       <Modal isOpen={isModalOpen} onOpenChange={setIsModalOpen}>

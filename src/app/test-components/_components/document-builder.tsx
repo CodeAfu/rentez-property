@@ -18,16 +18,22 @@ const fetchBuilderToken = async () => {
 };
 
 export default function DocumentBuilder() {
-  const { data: token, isLoading } = useQuery({
+  const {
+    data: token,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["builder-token"],
     queryFn: fetchBuilderToken,
   });
 
-  if (!token) return null;
+  // if (!token) return null;
 
   return (
-    <div className="relative max-w-6xl mx-auto overflow-y-scroll bg-slate-200">
+    <div className="relative max-w-6xl h-[calc(100dvh-4rem)] mx-auto overflow-y-scroll bg-slate-200">
       {isLoading && <LoadingSpinner />}
+      {isError && <div className="text-red-500">{error.message}</div>}
       <DocusealBuilder token={token} />
     </div>
   );
