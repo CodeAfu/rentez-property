@@ -5,17 +5,17 @@ const api = axios.create({
   withCredentials: true,
 });
 
+let isRefreshing = false;
+
 const refreshAccessToken = async (): Promise<string | null> => {
   try {
     const response = await api.post("/api/auth/refresh");
     const newAccessToken = response.data.accessToken;
-
-    localStorage.setItem("accessToken", newAccessToken);
-
+    sessionStorage.setItem("accessToken", newAccessToken);
     return newAccessToken;
   } catch {
-    localStorage.removeItem("accessToken");
-    window.location.href = "/login";
+    sessionStorage.removeItem("accessToken");
+    window.location.href = "/auth/login";
     return null;
   }
 };
@@ -23,7 +23,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 // Request interceptor - Add access token to headers
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = sessionStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,9 +40,15 @@ api.interceptors.response.use(
 
     // If 401 and haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       const newToken = await refreshAccessToken();
+      isRefreshing = false;
 
       if (newToken) {
         originalRequest.headers.Authorization = `Bearer ${newToken}`;

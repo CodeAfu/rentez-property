@@ -11,9 +11,11 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { v4 as uuidv4 } from "uuid";
+
 interface ToastContextType {
   toast: (toast: Omit<ToastType, "id">) => void;
 }
+
 interface ToastProviderProps {
   children: ReactNode;
   timeout?: number;
