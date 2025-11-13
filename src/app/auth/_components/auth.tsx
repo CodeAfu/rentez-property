@@ -2,14 +2,22 @@
 import useAuth from "@/hooks/useAuth";
 import Login from "./login";
 import Register from "./register";
+import Logout from "./logout";
+import { Fragment } from "react";
 
 export default function Auth() {
   const isAuthenticated = useAuth();
-  if (isAuthenticated) return null;
+  if (isAuthenticated === null) return null;
   return (
     <div className="px-4 flex gap-2 items-center">
-      <Login />
-      <Register />
+      {isAuthenticated ? (
+        <Logout />
+      ) : (
+        <Fragment>
+          <Login />
+          <Register />
+        </Fragment>
+      )}
     </div>
   );
 }

@@ -1,23 +1,17 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
+import { useIsMounted } from "./useIsMounted";
 
 export default function useAuth() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const mounted = useIsMounted();
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
-    if (!token) {
-      setIsAuthenticated(false);
-      return;
-    }
+  return useMemo(() => {
+    if (!mounted) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const isExpired = payload.exp * 1000 < Date.now();
-      setIsAuthenticated(!isExpired);
+      const token = localStorage.getItem("accessToken");
+      if (token) return true; 
     } catch {
-      setIsAuthenticated(false);
+      return false;
     }
-  }, []);
-
-  return isAuthenticated;
+  }, [mounted]);
 }

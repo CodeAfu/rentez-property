@@ -42,7 +42,7 @@ export default function LoginForm() {
     mutationFn: login,
     onSuccess: (data) => {
       const { accessToken } = data.data;
-      sessionStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("accessToken", accessToken);
       console.log(data);
       window.location.href = "/";
     },
