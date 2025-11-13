@@ -56,7 +56,7 @@ export default function DocumentSubmit() {
             drop
           </p>
           <p className="text-xs text-muted-foreground">
-            PDF, DOC, or DOCX (MAX. 10MB)
+            PDF Document
           </p>
         </div>
         <input

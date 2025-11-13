@@ -18,7 +18,7 @@ export type Property = {
 		gas?: boolean;
 	};
 	roomType?: 'Master Bedroom' | 'Medium Room' | 'Small Room' | 'Studio';
-	racesPreferred?: Array<'Chinese' | 'Malay' | 'Indian'>; // example preferences
-	occupationsPreferred?: Array<'Student' | 'Employed' | 'Unemployed'>;
+	preferredRaces?: 'Chinese' | 'Malay' | 'Indian'; // example preferences
+	preferredOccupation?: 'Student' | 'Employed' | 'Unemployed';
 	leaseTermCategory?: 'Less than 6 month' | '6 month' | '12 months and above';
 };

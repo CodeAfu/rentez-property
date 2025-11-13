@@ -13,13 +13,22 @@ export default function TestPage() {
       <ComponentDisplay display={false} title="shadcn Theme Colors">
         <ColorShowcase />
       </ComponentDisplay>
-      <ComponentDisplay display={false} title="DocuSeal Document View">
+      <ComponentDisplay
+        display={false}
+        title="DocuSeal Document View (Embedded)"
+      >
         <DocumentView />
       </ComponentDisplay>
-      <ComponentDisplay display={false} title="DocuSeal Document Submit">
+      <ComponentDisplay
+        display={false}
+        title="DocuSeal Document Builder (Embedded, Paid Feature?)"
+      >
         <DocumentBuilder />
       </ComponentDisplay>
-      <ComponentDisplay display={false} title="DocuSeal Document Submit">
+      <ComponentDisplay
+        display={false}
+        title="DocuSeal Document Builder (My Solution)"
+      >
         <DocumentSubmit />
       </ComponentDisplay>
     </div>
