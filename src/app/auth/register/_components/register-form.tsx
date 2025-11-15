@@ -39,6 +39,7 @@ export default function RegisterForm() {
     mutate: registerMutation,
     isError,
     isPending,
+    error,
   } = useMutation({
     mutationFn: registerApi,
     onSuccess: (data) => {
@@ -68,6 +69,15 @@ export default function RegisterForm() {
     registerMutation(data);
   };
 
+  const getErrorMessage = () => {
+    if (!error) return "";
+    if (axios.isAxiosError(error)) {
+      const backend = error.response?.data || {};
+      const devEnv = process.env.NODE_ENV === "development";
+      return devEnv ? backend.error || "Unknown Error" : backend.message || "Something went wrong"
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
@@ -96,7 +106,7 @@ export default function RegisterForm() {
         <Button disabled={isPending} type="submit">
           {isPending ? "..." : "Register"}
         </Button>
-        {isError && <p className="text-sm text-red-500">Registration Failed</p>}
+        {isError && <p className="text-sm text-red-500">{getErrorMessage()}</p>}
       </div>
     </form>
   );

@@ -3,10 +3,10 @@ import Toast from "@/components/toast";
 import { TOAST_EXIT_ANIMATION_DURATION } from "@/lib/consts";
 import { ToastType } from "@/types/toast";
 import {
+  ReactNode,
   createContext,
   useContext,
   useState,
-  ReactNode,
   useEffect,
 } from "react";
 import { createPortal } from "react-dom";

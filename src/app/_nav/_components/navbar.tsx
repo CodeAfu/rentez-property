@@ -27,6 +27,10 @@ const routes: Routes = [
     href: "/this-link-does-not-exist-for-sure",
     devOnly: true,
   },
+  {
+    label: "User Settings",
+    href: "/user/settings",
+  }
 ];
 
 export default function Navbar() {
