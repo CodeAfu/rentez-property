@@ -60,7 +60,7 @@ export const withAuth = <T extends unknown[], R>(
       if (expTimestamp < now) {
         try {
           token = await refreshAccessToken();
-        } catch (error) {
+        } catch {
           localStorage.removeItem("accessToken");
           window.location.href = "/auth/login";
           throw new Error("Session expired. Please login again");
