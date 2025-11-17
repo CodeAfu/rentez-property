@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/providers/toast-provider";
@@ -19,7 +20,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 const registerApi = async (data: RegisterFormData) => {
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
-    data
+    data,
   );
   console.log(response);
   return response;
@@ -74,9 +75,11 @@ export default function RegisterForm() {
     if (axios.isAxiosError(error)) {
       const backend = error.response?.data || {};
       const devEnv = process.env.NODE_ENV === "development";
-      return devEnv ? backend.error || "Unknown Error" : backend.message || "Something went wrong"
+      return devEnv
+        ? backend.error || "Unknown Error"
+        : backend.message || "Something went wrong";
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
