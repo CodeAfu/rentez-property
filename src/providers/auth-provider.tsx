@@ -10,7 +10,7 @@ import {
   ReactNode,
 } from "react";
 import { useToast } from "./toast-provider";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import { LoginFormData } from "@/types/user";
 
@@ -34,7 +34,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const { toast } = useToast();
 
@@ -79,7 +78,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { accessToken } = data.data;
       localStorage.setItem("accessToken", accessToken);
       setIsAuthenticated(true);
-      router.push(searchParams.get("redirectTo") ?? "/");
+
+      const params = new URLSearchParams(window.location.search);
+      router.push(params.get("redirectTo") ?? "/");
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {
