@@ -18,11 +18,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const registerApi = async (data: RegisterFormData) => {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`,
-    data,
-  );
-  console.log(response);
+  const response = await api.post("/api/auth/register", data);
   return response;
 };
 
@@ -43,8 +39,7 @@ export default function RegisterForm() {
     error,
   } = useMutation({
     mutationFn: registerApi,
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: () => {
       window.location.href = "/";
     },
     onError: (error) => {

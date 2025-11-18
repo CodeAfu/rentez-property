@@ -52,17 +52,13 @@ export const withAuth = <T extends unknown[], R>(
           ? decoded.exp
           : Math.floor(new Date(decoded.exp).getTime() / 1000);
 
-      console.log("now:", now);
-      console.log("exp:", expTimestamp);
-      console.log("expired?:", expTimestamp < now);
-
       // Token expired - attempt refresh
       if (expTimestamp < now) {
         try {
           token = await refreshAccessToken();
         } catch {
           localStorage.removeItem("accessToken");
-          window.location.href = "/auth/login";
+          // window.location.href = "/auth/login";
           throw new Error("Session expired. Please login again");
         }
       }

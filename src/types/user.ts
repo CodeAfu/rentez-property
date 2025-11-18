@@ -14,4 +14,10 @@ export const userSchema = z.object({
   updated_at: z.date(),
 });
 
+export const loginSchema = z.object({
+  email: z.email("Invalid email"),
+  password: z.string().min(1, "Password required"),
+});
+
 export type User = z.infer<typeof userSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;

@@ -1,30 +1,14 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
-import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useToast } from "@/providers/toast-provider";
-
-const loginSchema = z.object({
-  email: z.email("Invalid email"),
-  password: z.string().min(1, "Password required"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
-const login = async (data: LoginFormData) => {
-  const response = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
-    data
-  );
-  return response;
-};
+import { LoginFormData, loginSchema } from "@/types/user";
+import { useAuth } from "@/providers/auth-provider";
 
 export default function LoginForm() {
-  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -32,41 +16,12 @@ export default function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
-
   const {
-    mutate: loginMutation,
-    isError,
-    isPending,
-    error,
-  } = useMutation({
-    mutationFn: login,
-    onSuccess: (data) => {
-      const { accessToken } = data.data;
-      localStorage.setItem("accessToken", accessToken);
-      console.log(data);
-      window.location.href = "/";
-    },
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        const devEnv = process.env.NODE_ENV === "development";
-        const backendData = error.response?.data || {};
-        const message = devEnv ? backendData.error : backendData.message;
-
-        console.error("Login Error:", message);
-
-        toast({
-          type: "error",
-          title: "Error",
-          message,
-        });
-      } else {
-        console.error("Unexpected Error:", error);
-      }
-    },
-  });
+    loginMutation: { mutate: login, isPending, error, isError },
+  } = useAuth();
 
   const onSubmit = (data: LoginFormData) => {
-    loginMutation(data);
+    login(data);
   };
 
   const getErrorMessage = () => {
@@ -74,9 +29,11 @@ export default function LoginForm() {
     if (axios.isAxiosError(error)) {
       const backend = error.response?.data || {};
       const devEnv = process.env.NODE_ENV === "development";
-      return devEnv ? backend.error || "Unknown Error" : backend.message || "Login failed"
+      return devEnv
+        ? backend.error || "Unknown Error"
+        : backend.message || "Login failed";
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">

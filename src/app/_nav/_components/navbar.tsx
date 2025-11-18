@@ -14,8 +14,12 @@ const routes: Routes = [
     href: "/property",
   },
   {
+    label: "Settings",
+    href: "/user/settings",
+  },
+  {
     label: "Landlord",
-    href: "/user/landlord"
+    href: "/user/landlord",
   },
   {
     label: "Test Stuff",
@@ -27,26 +31,22 @@ const routes: Routes = [
     href: "/this-link-does-not-exist-for-sure",
     devOnly: true,
   },
-  {
-    label: "User Settings",
-    href: "/user/settings",
-  }
 ];
 
 export default function Navbar() {
   const visibleRoutes = routes.filter(
-    (route) => !route.devOnly || process.env.NODE_ENV === "development"
+    (route) => !route.devOnly || process.env.NODE_ENV === "development",
   );
   return (
     <nav className="sticky flex items-center justify-between h-16 bg-card shadow-sm overflow-hidden">
       <div className="flex h-full items-center">
-        <Link href="/" className="block px-4 flex-shrink-0">
+        <Link href="/" className="px-4 flex">
           <Image
             src="/assets/rentez-logo.svg"
             alt="logo"
             width={30}
             height={30}
-            className="flex-shrink-0 w-[30px] h-[30px]"
+            className="shrink-0 w-[30px] h-[30px]"
           />
         </Link>
 

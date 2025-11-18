@@ -8,10 +8,6 @@ export default function MainContent() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") || "overview";
 
-  if (tabParam == "") {
-    console.log(tabParam);
-  }
-
   return (
     <div className="flex gap-2">
       {/* Left */}

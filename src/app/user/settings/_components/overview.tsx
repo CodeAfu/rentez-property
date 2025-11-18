@@ -52,8 +52,6 @@ export default function Overview() {
     isError,
   } = useQuery(getCurrentUserOptions());
 
-  console.log(userData);
-
   if (isPending || isLoading) {
     return <LoadingSpinner />;
   }
@@ -64,7 +62,12 @@ export default function Overview() {
 
   return (
     <div>
-      <h2 className="font-semibold text-xl mb-4">Overview</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-xl mb-4">Overview</h2>
+        <button className="text-sm border-primary bg-muted px-4 py-1 shadow rounded">
+          Edit
+        </button>
+      </div>
       <div className="flex flex-col gap-2">
         <div className="grid grid-cols-[auto_1fr] items-center gap-4">
           {info.map((item) => (
