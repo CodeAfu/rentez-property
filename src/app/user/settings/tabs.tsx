@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import Overview from "./_components/overview";
-import Test from "./_components/test";
+import Overview from "./_components/_tabs/overview";
+import Test from "./_components/_tabs/test";
 
 interface Tab {
   label: string;

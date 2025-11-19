@@ -6,7 +6,7 @@ import { Edit } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/loading-spinner";
-import { getCurrentUserOptions } from "../query";
+import { getCurrentUserOptions } from "../../query";
 
 const info: Info[] = [
   { label: "First Name:" },

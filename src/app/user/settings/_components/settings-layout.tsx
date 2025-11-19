@@ -1,20 +1,24 @@
 "use client";
 
-import MainContent from "./main-content";
 import LoadingSpinner from "@/components/loading-spinner";
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import Menus from "./menus";
+import { tabs } from "../tabs";
 
 export default function SettingsLayout() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") || "overview";
 
   useEffect(() => {
     if (isAuthenticated === false) {
-      router.push("/auth/login");
+      router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, pathname]);
 
   if (isAuthenticated === null) {
     return <LoadingSpinner />;
@@ -22,7 +26,15 @@ export default function SettingsLayout() {
 
   return (
     <div className="mt-4 p-4">
-      <MainContent />
+      <div className="flex gap-2">
+        {/* Left */}
+        <Menus />
+
+        {/* Right */}
+        <div className="bg-card shadow flex-1 sm-p-32 p-8">
+          {tabs[tabParam].node}
+        </div>
+      </div>
     </div>
   );
 }

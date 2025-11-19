@@ -37,11 +37,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const { toast } = useToast();
 
+  const syncAuthState = () => {
+    setIsAuthenticated(!!localStorage.getItem("accessToken"));
+  };
+
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSuccess: (data) => {
       localStorage.removeItem("accessToken");
-      setIsAuthenticated(false);
+      syncAuthState();
       console.log(data);
     },
     onError: (err) => {
@@ -59,14 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             type: "error",
           });
           localStorage.removeItem("accessToken");
-          setIsAuthenticated(false);
+          syncAuthState();
         } else {
           toast({
             title: "ERROR (DEV)",
             message: "'accessToken' is already null. State management issue.",
             type: "error",
           });
-          setIsAuthenticated(false);
+          syncAuthState();
         }
       }
     },
@@ -102,8 +106,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    setIsAuthenticated(!!localStorage.getItem("accessToken"));
+    const checkAuth = () => {
+      setIsAuthenticated(!!localStorage.getItem("accessToken"));
+    };
+
+    checkAuth();
     setMounted(true);
+
+    // Listen for storage changes from other tabs
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
   if (!mounted) return null;
