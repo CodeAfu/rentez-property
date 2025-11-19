@@ -1,26 +1,26 @@
 "use client";
 
-import LoadingSpinner from "@/components/loading-spinner";
 import { useAuth } from "@/providers/auth-provider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import Menus from "./menus";
 import { tabs } from "../tabs";
+import LoadingSpinner from "@/components/loading-spinner";
 
 export default function SettingsLayout() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAuthenticating } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") || "overview";
 
   useEffect(() => {
-    if (isAuthenticated === false) {
+    if (!isAuthenticated) {
       router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
   }, [isAuthenticated, router, pathname]);
 
-  if (isAuthenticated === null) {
+  if (isAuthenticating) {
     return <LoadingSpinner />;
   }
 

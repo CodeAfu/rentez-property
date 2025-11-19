@@ -13,9 +13,11 @@ import { useToast } from "./toast-provider";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import { LoginFormData } from "@/types/user";
+import { decodeToken, refreshAccessToken } from "@/lib/auth";
 
-const AuthContext = createContext<{
+interface AuthContextType {
   isAuthenticated: boolean;
+  isAuthenticating: boolean;
   loginMutation: UseMutationResult<
     AxiosResponse,
     Error,
@@ -23,7 +25,9 @@ const AuthContext = createContext<{
     unknown
   >;
   logoutMutation: UseMutationResult<AxiosResponse, Error, void, unknown>;
-} | null>(null);
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 const logoutRequest = async () => await api.post("/api/auth/logout");
 
@@ -32,47 +36,60 @@ const loginRequest = async (data: LoginFormData) =>
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const router = useRouter();
-
   const { toast } = useToast();
 
-  const syncAuthState = () => {
-    setIsAuthenticated(!!localStorage.getItem("accessToken"));
+  const initalizeAuth = async () => {
+    setIsAuthenticating(true);
+    const token = localStorage.getItem("accessToken");
+
+    // 1- Token exists in storage
+    if (token) {
+      const decoded = decodeToken(token);
+      const now = Math.floor(Date.now() / 1000);
+
+      if (decoded && decoded.exp > now) {
+        setIsAuthenticated(true);
+        setIsAuthenticating(false);
+        return;
+      }
+    }
+
+    // 2- Token null/expired => try silent refresh
+    try {
+      await refreshAccessToken();
+      setIsAuthenticated(true);
+    } catch {
+      localStorage.removeItem("accessToken");
+      setIsAuthenticated(false);
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
+
+  useEffect(() => {
+    initalizeAuth();
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "accessToken" && e.newValue === null) {
+        setIsAuthenticated(false);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSuccess: (data) => {
       localStorage.removeItem("accessToken");
-      syncAuthState();
+      setIsAuthenticated(false);
       console.log(data);
     },
     onError: (err) => {
-      if (
-        axios.isAxiosError(err) &&
-        err.response?.status === 401 &&
-        process.env.NODE_ENV === "development"
-      ) {
-        if (localStorage.getItem("accessToken")) {
-          localStorage.removeItem("accessToken");
-          toast({
-            title: "ERROR (DEV)",
-            message:
-              "Removing 'accessToken' from Removing 'accessToken' from localStorage unsafely. Fix ASAP (probably issue with 'api/user/logout')ocalStorage unsafely. Fix ASAP (probably issue with 'api/user/logout')",
-            type: "error",
-          });
-          localStorage.removeItem("accessToken");
-          syncAuthState();
-        } else {
-          toast({
-            title: "ERROR (DEV)",
-            message: "'accessToken' is already null. State management issue.",
-            type: "error",
-          });
-          syncAuthState();
-        }
-      }
+      localStorage.removeItem("accessToken");
+      console.error(err);
+      setIsAuthenticated(false);
     },
   });
 
@@ -82,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { accessToken } = data.data;
       localStorage.setItem("accessToken", accessToken);
       setIsAuthenticated(true);
-
       const params = new URLSearchParams(window.location.search);
       router.push(params.get("redirectTo") ?? "/");
     },
@@ -91,38 +107,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const devEnv = process.env.NODE_ENV === "development";
         const backendData = err.response?.data || {};
         const message = devEnv ? backendData.error : backendData.message;
-
         console.error("Login Error:", message);
-
         toast({
           type: "error",
           title: "Error",
           message,
         });
-      } else {
-        console.error("Unexpected Error:", err);
       }
     },
   });
 
-  useEffect(() => {
-    const checkAuth = () => {
-      setIsAuthenticated(!!localStorage.getItem("accessToken"));
-    };
-
-    checkAuth();
-    setMounted(true);
-
-    // Listen for storage changes from other tabs
-    window.addEventListener("storage", checkAuth);
-    return () => window.removeEventListener("storage", checkAuth);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, loginMutation, logoutMutation }}
+      value={{
+        isAuthenticated,
+        isAuthenticating,
+        loginMutation,
+        logoutMutation,
+      }}
     >
       {children}
     </AuthContext.Provider>

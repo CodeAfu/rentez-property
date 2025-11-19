@@ -7,8 +7,8 @@ import { Fragment } from "react";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function Auth() {
-  const { isAuthenticated } = useAuth();
-  if (isAuthenticated === null) return null;
+  const { isAuthenticated, isAuthenticating } = useAuth();
+  if (isAuthenticating) return null;
   return (
     <div className="px-4 flex gap-2 items-center">
       {isAuthenticated ? (

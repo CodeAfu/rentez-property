@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import decodeToken, { withAuth } from "@/lib/auth";
+import { decodeToken, withAuth } from "@/lib/auth";
 import { queryOptions } from "@tanstack/react-query";
 
 const getUserOverview = withAuth(async () => {
