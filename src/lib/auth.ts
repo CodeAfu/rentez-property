@@ -13,7 +13,7 @@ export function decodeToken(token: string): TokenPayload | null {
 export const refreshAccessToken = async (): Promise<string> => {
   console.log("Calling refresh endpoint...");
   const response = await api.post("/api/auth/refresh");
-  console.log("Refresh response:", response.data);
+  // console.log("Refresh response:", response.data);
   const newAccessToken = response.data.accessToken;
   localStorage.setItem("accessToken", newAccessToken);
   return newAccessToken;
