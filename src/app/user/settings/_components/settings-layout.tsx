@@ -15,7 +15,7 @@ export default function SettingsLayout() {
   const tabParam = searchParams.get("tab") || "overview";
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !isAuthenticating) {
       router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
   }, [isAuthenticated, router, pathname]);
