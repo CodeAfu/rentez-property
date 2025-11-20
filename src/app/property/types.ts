@@ -3,7 +3,7 @@ export type Property = {
   id: string;
   title: string;
   description: string;
-  pricePerMonth: number;
+  rent: number;
   address: string;
   city: string;
   state: string;

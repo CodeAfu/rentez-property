@@ -18,8 +18,8 @@ const routes: Routes = [
     href: "/user/settings",
   },
   {
-    label: "Landlord",
-    href: "/user/landlord",
+    label: "Create Property",
+    href: "/property/create",
   },
   {
     label: "Test Stuff",
