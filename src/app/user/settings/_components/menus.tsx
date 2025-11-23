@@ -13,7 +13,7 @@ export default function Menus() {
           key={key}
           variant="link"
           size="sm"
-          className="p-0 h-fit w-fit tracking-tighter"
+          className="p-0 h-fit w-fit tracking-tighter hover:cursor-pointer transition duration-200"
           onClick={() => router.push(`?tab=${key}`)}
         >
           {tab.label}

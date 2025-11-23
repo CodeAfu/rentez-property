@@ -1,4 +1,3 @@
-
 export type Property = {
   id: string;
   title: string;
@@ -21,4 +20,17 @@ export type Property = {
   preferredRaces?: "Chinese" | "Malay" | "Indian"; // example preferences
   preferredOccupation?: "Student" | "Employed" | "Unemployed";
   leaseTermCategory?: "Less than 6 month" | "6 month" | "12 months and above";
+};
+
+export type Pagination = {
+  pageNum: number;
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+export type PaginatedProperty = {
+  items: Property[];
+  pagination: Pagination;
 };

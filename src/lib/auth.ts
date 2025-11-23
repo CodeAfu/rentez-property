@@ -32,6 +32,7 @@ export const withAuth = <T extends unknown[], R>(
     // Token exists and not expired
     if (token) {
       const decoded = decodeToken(token);
+      console.log(decoded);
       if (decoded) {
         const now = Math.floor(Date.now() / 1000);
         const expTimestamp =

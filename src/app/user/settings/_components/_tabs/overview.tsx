@@ -2,11 +2,10 @@
 
 import { Fragment } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Edit } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
-import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserOptions } from "../../query";
+import LoadingSpinner from "@/components/loading-spinner";
 
 interface Info {
   label: string;
