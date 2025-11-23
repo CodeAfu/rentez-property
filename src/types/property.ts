@@ -1,12 +1,13 @@
 import { z } from "zod";
+import { Pagination } from "@/types/pagination";
 
 export const propertySchema = z.object({
   id: z.guid(),
-  ownerId: z.guid(),
-  tenantId: z.guid(),
+  ownerId: z.guid().optional(),
+  tenantId: z.guid().optional(),
   title: z.string(),
   description: z.string(),
-  pricePerMonth: z.number(),
+  rent: z.number(),
   address: z.string(),
   city: z.string(),
   state: z.string(),
@@ -28,3 +29,10 @@ export const propertySchema = z.object({
   preferredOccupation: z.array(z.string()),
   leaseTermCategoryMonths: z.int(),
 });
+
+export type Property = z.infer<typeof propertySchema>;
+
+export type PaginatedProperty = {
+  items: Property[];
+  pagination: Pagination;
+};
