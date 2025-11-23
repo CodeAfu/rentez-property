@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import { PropertyCard } from "./property-card";
 import { Input } from "@/components/ui/input";
-import { PaginatedProperty } from "../types";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { PaginatedProperty } from "@/types/property";
 
 async function getProperties() {
   const response = await api.get<PaginatedProperty>("/api/Property");
