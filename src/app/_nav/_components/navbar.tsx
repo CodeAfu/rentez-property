@@ -22,7 +22,7 @@ const routes: Routes = [
     href: "/property/create",
   },
   {
-    label: "Test Stuff",
+    label: "Test",
     href: "/test-components",
     // devOnly: true,
   },

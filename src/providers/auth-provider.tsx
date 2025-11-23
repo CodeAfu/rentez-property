@@ -15,6 +15,12 @@ import axios, { AxiosResponse } from "axios";
 import { LoginFormData } from "@/types/user";
 import { decodeToken, refreshAccessToken } from "@/lib/auth";
 
+interface UserClaim {
+  id?: string;
+  email?: string;
+  role?: string;
+}
+
 interface AuthContextType {
   isAuthenticated: boolean;
   isAuthenticating: boolean;
@@ -25,6 +31,7 @@ interface AuthContextType {
     unknown
   >;
   logoutMutation: UseMutationResult<AxiosResponse, Error, void, unknown>;
+  user: UserClaim | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,6 +44,7 @@ const loginRequest = async (data: LoginFormData) =>
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [user, setUser] = useState<UserClaim | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -47,6 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 1- Token exists in storage
     if (token) {
       const decoded = decodeToken(token);
+      setUser({
+        id: decoded?.sub,
+        email: decoded?.name,
+        role: decoded?.role,
+      });
       const now = Math.floor(Date.now() / 1000);
 
       if (decoded && decoded.exp > now) {
@@ -124,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticating,
         loginMutation,
         logoutMutation,
+        user,
       }}
     >
       {children}

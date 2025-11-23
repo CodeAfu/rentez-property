@@ -46,7 +46,7 @@ export default function DocumentSubmit() {
           "transition-colors",
           isDragging
             ? "border-primary bg-primary/5"
-            : "border-border hover:border-primary/50 hover:bg-accent/10"
+            : "border-border hover:border-primary/50 hover:bg-accent/10",
         )}
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -55,9 +55,7 @@ export default function DocumentSubmit() {
             <span className="font-semibold">Click to upload</span> or drag and
             drop
           </p>
-          <p className="text-xs text-muted-foreground">
-            PDF Document
-          </p>
+          <p className="text-xs text-muted-foreground">PDF Document</p>
         </div>
         <input
           id="file-upload"
