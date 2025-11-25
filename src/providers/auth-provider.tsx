@@ -1,7 +1,11 @@
 "use client";
 
 import api from "@/lib/api";
-import { useMutation, UseMutationResult } from "@tanstack/react-query";
+import {
+  useMutation,
+  UseMutationResult,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   createContext,
   useContext,
@@ -46,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<UserClaim | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const initalizeAuth = async () => {
@@ -95,6 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["login"],
+      });
       localStorage.removeItem("accessToken");
       setIsAuthenticated(false);
       console.log(data);
@@ -107,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const loginMutation = useMutation({
+    mutationKey: ["login"],
     mutationFn: loginRequest,
     onSuccess: (data) => {
       const { accessToken } = data.data;

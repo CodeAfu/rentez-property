@@ -6,11 +6,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, UseFormRegister } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingSpinner from "@/components/loading-spinner";
-import {
-  getCurrentUserOptions,
-  editUserInfoOptions,
-} from "@/queries/current-user-query";
+import { getCurrentUserOptions } from "@/queries/get-current-user-query";
 import { EditUserRequest, editUserSchema } from "../../types";
+import { editUserInfoOptions } from "@/queries/edit-current-user-query";
 
 interface Info {
   label: string;
@@ -28,6 +26,7 @@ function InputField({
   register: UseFormRegister<EditUserRequest>;
   error?: string;
 }) {
+  const isDateField = item.name == "dateOfBirth";
   return (
     <Fragment>
       <label className="text-nowrap text-muted-foreground text-sm">
@@ -36,6 +35,7 @@ function InputField({
       <div className="flex flex-col gap-1">
         <Input
           {...register(item.name)}
+          type={isDateField ? "date" : "text"}
           disabled={!editMode}
           className="w-full disabled:bg-muted"
         />
@@ -72,7 +72,9 @@ export default function Overview() {
           lastName: userData.data.lastName || "",
           occupation: userData.data.occupation || "",
           ethnicity: userData.data.ethnicity || "",
-          dateOfBirth: userData.data.dateOfBirth || "",
+          dateOfBirth: userData.data.dateOfBirth
+            ? userData.data.dateOfBirth.split("T")[0]
+            : "",
         }
       : undefined,
   });
