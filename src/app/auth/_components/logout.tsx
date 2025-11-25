@@ -2,8 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
+import { getCurrentUserOptions } from "@/queries/get-current-user-query";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Logout() {
+  const { data: userData } = useQuery(getCurrentUserOptions());
   const {
     logoutMutation: { mutate: logout },
   } = useAuth();
@@ -11,9 +14,22 @@ export default function Logout() {
   const handleLogout = () => {
     logout();
   };
+
+  const userMessage =
+    userData?.data?.firstName || userData?.data?.lastName
+      ? `${userData?.data?.firstName} ${userData?.data?.lastName}`.trim()
+      : userData?.data?.email;
   return (
-    <Button onClick={handleLogout} size="sm" variant="outline">
-      Logout
-    </Button>
+    <div className="flex items-center gap-4">
+      <p className="inline-flex flex-col text-xs leading-none">
+        <span>Welcome, </span>
+        <span className="font-semibold text-primary text-sm leading-none">
+          {userMessage}!
+        </span>
+      </p>
+      <Button onClick={handleLogout} size="sm" variant="outline">
+        Logout
+      </Button>
+    </div>
   );
 }

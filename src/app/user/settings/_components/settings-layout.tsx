@@ -18,7 +18,7 @@ export default function SettingsLayout() {
     if (!isAuthenticated && !isAuthenticating) {
       router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthenticated, router, pathname]);
+  }, [isAuthenticated, isAuthenticating, router, pathname]);
 
   if (isAuthenticating) {
     return <LoadingSpinner />;
