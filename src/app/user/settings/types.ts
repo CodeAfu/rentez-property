@@ -1,7 +1,11 @@
-export interface EditUserRequest {
-  firstName: string;
-  lastName: string;
-  occupation: string;
-  ethnicity: string;
-  dateOfBirth: string;
-}
+import z from "zod";
+
+export const editUserSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  occupation: z.string(),
+  ethnicity: z.string(),
+  dateOfBirth: z.string(),
+});
+
+export type EditUserRequest = z.infer<typeof editUserSchema>;

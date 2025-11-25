@@ -1,7 +1,7 @@
+import { EditUserRequest } from "@/app/user/settings/types";
 import api from "@/lib/api";
 import { decodeToken, withAuth } from "@/lib/auth";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { EditUserRequest } from "./types";
 
 const getUserOverview = withAuth(async () => {
   return api.get("/api/users/u");
@@ -17,9 +17,10 @@ export const getCurrentUserOptions = () =>
     queryFn: getUserOverview,
   });
 
-export const editUserInfoOptions = (id: string, data: EditUserRequest) => {
+export const editUserInfoOptions = (id: string) =>
   mutationOptions({
-    // mutationKey: ["api", "users", id],
-    mutationFn: () => editUserInfo(id, data),
+    mutationFn: (data: EditUserRequest) => editUserInfo(id, data),
+    onError: (err) => {
+      console.error(err);
+    },
   });
-};
