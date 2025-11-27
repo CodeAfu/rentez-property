@@ -14,7 +14,7 @@ function PropertyRow({ property }: { property: Property }) {
     <div className="border rounded-lg p-4 hover:bg-accent/5 transition">
       <div className="flex gap-4">
         <div className="flex items-center">
-          <div className="w-32 h-24 shrink-0 flex items-center rounded overflow-hidden hover:scale-105 hover:rotate-5 transition duration-200">
+          <div className="w-32 h-24 shrink-0 flex items-center rounded overflow-hidden hover:scale-105 transition duration-200">
             <img
               src={primaryImage}
               alt={property.title}
@@ -60,7 +60,7 @@ function PropertyRow({ property }: { property: Property }) {
                 Edit
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="sm">
+            <Button asChild size="sm">
               <Link href={`/user/property/${property.id}`}>View Details</Link>
             </Button>
           </div>

@@ -1,2 +1,4 @@
 export const TOAST_EXIT_ANIMATION_DURATION = 200; // ms
 export const TOAST_ENTRY_ANIMATION_DURATION = 300; // ms
+export const NULL_DATE_ENTRY = "0001-01-01T00:00:00";
+
