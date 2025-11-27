@@ -9,6 +9,9 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserOptions } from "@/queries/get-current-user-query";
 import { EditUserRequest, editUserSchema } from "../../types";
 import { editUserInfoOptions } from "@/queries/edit-current-user-query";
+import { NULL_DATE_ENTRY } from "@/lib/consts";
+import axios from "axios";
+import { decodeToken } from "@/lib/auth";
 
 interface Info {
   label: string;
@@ -72,9 +75,11 @@ export default function Overview() {
           lastName: userData.data.lastName || "",
           occupation: userData.data.occupation || "",
           ethnicity: userData.data.ethnicity || "",
-          dateOfBirth: userData.data.dateOfBirth
-            ? userData.data.dateOfBirth.split("T")[0]
-            : "",
+          dateOfBirth:
+            userData.data.dateOfBirth &&
+            userData.data.dateOfBirth !== NULL_DATE_ENTRY
+              ? userData.data.dateOfBirth.split("T")[0]
+              : "",
         }
       : undefined,
   });
@@ -82,7 +87,9 @@ export default function Overview() {
   const mutation = useMutation({
     ...editUserInfoOptions(userData?.data?.id || ""),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["api", "users", "u"] });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "u", decodeToken("accessToken")],
+      });
       setEditMode(false);
     },
   });
@@ -96,6 +103,20 @@ export default function Overview() {
       reset();
     }
     router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
+  const getMutationErrors = (error: Error) => {
+    if (axios.isAxiosError(error)) {
+      const errors = error.response?.data?.errors;
+      if (errors) {
+        return Object.entries(errors)
+          .map(
+            ([field, messages]) =>
+              `${field}: ${(messages as string[]).join(", ")}`,
+          )
+          .join("; ");
+      }
+    }
   };
 
   const onSubmit = (data: EditUserRequest) => {
@@ -148,24 +169,30 @@ export default function Overview() {
           </div>
         </div>
         {editMode && (
-          <div className="mt-8 flex flex-row-reverse gap-2 items-center">
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className="text-sm border-border bg-primary text-primary-foreground px-4 py-1 shadow rounded 
+          <div className="flex justify-between gap-4 mt-8">
+            <p className="text-red-500 text-xs pt-4">
+              {mutation.isError && getMutationErrors(mutation.error)}
+            </p>
+
+            <div className="flex flex-row-reverse gap-2 items-center">
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="text-sm border-border bg-primary text-primary-foreground px-4 py-1 shadow rounded 
                 hover:bg-accent transition duration-200 disabled:opacity-50"
-            >
-              {mutation.isPending ? "Saving..." : "Save"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditMode(false)}
-              disabled={mutation.isPending}
-              className="text-sm border-border bg-card text-primary px-4 py-1 shadow rounded 
+              >
+                {mutation.isPending ? "Saving..." : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditMode(false)}
+                disabled={mutation.isPending}
+                className="text-sm border-border bg-card text-primary px-4 py-1 shadow rounded 
                 hover:bg-accent/10 transition duration-200"
-            >
-              Cancel
-            </button>
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </form>
