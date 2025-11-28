@@ -6,6 +6,7 @@ import Link from "next/link";
 import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserPropertyOptions } from "@/queries/get-current-user-property-query";
 import { Property } from "@/types/property";
+import { devOut } from "@/lib/utils";
 
 function PropertyRow({ property }: { property: Property }) {
   const primaryImage = property.images?.[0] || "/placeholder-property.jpg";
@@ -43,13 +44,15 @@ function PropertyRow({ property }: { property: Property }) {
             {property.roomType && property.roomType.length > 0 && (
               <span className="flex items-center gap-1">
                 <Home className="w-3 h-3" />
-                {/*property.roomType.join(", ")*/}
+                {property.roomType ? property.roomType.join(", ") : "Unset"}
               </span>
             )}
             {property.depositRequired && <span>Deposit Required</span>}
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              {new Date(property.createdAt).toLocaleDateString()}
+              {property.createdAt
+                ? new Date(property.createdAt).toLocaleDateString()
+                : "N/A"}
             </span>
           </div>
 
@@ -63,6 +66,21 @@ function PropertyRow({ property }: { property: Property }) {
             <Button asChild size="sm">
               <Link href={`/user/property/${property.id}`}>View Details</Link>
             </Button>
+            {property.agreementId ? (
+              <Button asChild size="sm">
+                <Link
+                  href={`/property/${property.id}/lease/${property.agreementId}`}
+                >
+                  View Lease
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild size="sm">
+                <Link href={`/property/${property.id}/lease`}>
+                  Create Lease
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -91,8 +109,7 @@ export default function ViewUserProperty() {
             My Property Listings
           </h2>
           <p className="text-sm text-muted-foreground">
-            {properties.length}{" "}
-            {properties.length === 1 ? "property" : "property listings"}
+            {properties.length === 1 ? "Property" : "Property Listings"}
           </p>
         </div>
         <Button asChild size="sm">
@@ -128,6 +145,9 @@ export default function ViewUserProperty() {
           ))}
         </div>
       )}
+      <p className="text-xs font-light text-gray-900 pt-4 max-w-full wrap-break-words">
+        {devOut(JSON.stringify(propertyData.data, null, 2))}
+      </p>
     </section>
   );
 }

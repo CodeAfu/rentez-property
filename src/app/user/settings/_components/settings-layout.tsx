@@ -26,12 +26,12 @@ export default function SettingsLayout() {
 
   return (
     <div className="mt-4 p-4">
-      <div className="flex gap-2">
+      <div className="grid grid-cols-[240px_1fr] gap-2">
         {/* Left */}
         <Menus />
 
         {/* Right */}
-        <div className="bg-card shadow flex-1 sm-p-32 p-8">
+        <div className="bg-card shadow sm-p-32 p-8 overflow-hidden">
           {tabs[tabParam].node}
         </div>
       </div>
