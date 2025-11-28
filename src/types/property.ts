@@ -5,6 +5,7 @@ export const propertySchema = z.object({
   id: z.guid(),
   ownerId: z.guid().optional(),
   tenantId: z.guid().optional(),
+  agreementId: z.guid().optional(),
   title: z.string(),
   description: z.string(),
   rent: z.number(),
@@ -12,7 +13,7 @@ export const propertySchema = z.object({
   city: z.string(),
   state: z.string(),
   images: z.array(z.string()),
-  createdAt: z.date(),
+  createdAt: z.string(),
   depositRequired: z.boolean().optional(),
   billsIncluded: z
     .object({
@@ -22,9 +23,7 @@ export const propertySchema = z.object({
       gas: z.boolean(),
     })
     .optional(),
-  roomType: z
-    .enum(["Master Bedroom", "Medium Room", "Small Room", "Studio"])
-    .optional(),
+  roomType: z.array(z.string()),
   preferredRaces: z.array(z.string()),
   preferredOccupation: z.array(z.string()),
   leaseTermCategoryMonths: z.int(),

@@ -6,15 +6,22 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
 
-const fetchBuilderToken = withAuth(async () => {
-  const response = await api.post("api/docuseal/builder-token");
+const fetchBuilderToken = withAuth(async (propertyId: string) => {
+  const response = await api.post(
+    `api/docuseal/builder-token?propertyId=${propertyId}`,
+  );
+  console.log(response.data.token);
   return response.data;
 });
 
-export default function DocumentBuilder() {
+interface DocumentBuilderProps {
+  propertyId: string;
+}
+
+export default function DocumentBuilder({ propertyId }: DocumentBuilderProps) {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["builder-token"],
-    queryFn: fetchBuilderToken,
+    queryKey: ["builder-token", propertyId],
+    queryFn: () => fetchBuilderToken(propertyId),
   });
 
   if (!data) return null;
@@ -23,7 +30,7 @@ export default function DocumentBuilder() {
     <div className="relative max-w-6xl h-[calc(100dvh-4rem)] mx-auto overflow-y-scroll bg-slate-200">
       {isLoading && <LoadingSpinner />}
       {isError && <div className="text-red-500">{error.message}</div>}
-      <DocusealBuilder token={data.token} />
+      <DocusealBuilder token={data.token.result} />
     </div>
   );
 }

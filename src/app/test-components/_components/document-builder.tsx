@@ -24,7 +24,7 @@ export default function DocumentBuilder() {
     <div className="relative max-w-6xl h-[calc(100dvh-4rem)] mx-auto overflow-y-scroll bg-slate-200">
       {isLoading && <LoadingSpinner />}
       {isError && <div className="text-red-500">{error.message}</div>}
-      <DocusealBuilder token={data.token} />
+      <DocusealBuilder token={data.token.result} />
     </div>
   );
 }

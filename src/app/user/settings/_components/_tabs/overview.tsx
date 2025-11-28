@@ -12,6 +12,7 @@ import { editUserInfoOptions } from "@/queries/edit-current-user-query";
 import { NULL_DATE_ENTRY } from "@/lib/consts";
 import axios from "axios";
 import { decodeToken } from "@/lib/auth";
+import { devOut } from "@/lib/utils";
 
 interface Info {
   label: string;
@@ -141,7 +142,7 @@ export default function Overview() {
   }
 
   return (
-    <div>
+    <section>
       <div className="flex items-center justify-between">
         <h2 className="font-bold text-primary text-2xl mb-8">Overview</h2>
         <button
@@ -197,8 +198,8 @@ export default function Overview() {
         )}
       </form>
       <p className="text-xs font-light text-gray-900 pt-4">
-        {JSON.stringify(userData.data, null, 2)}
+        {devOut(JSON.stringify(userData.data, null, 2))}
       </p>
-    </div>
+    </section>
   );
 }
