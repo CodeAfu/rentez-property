@@ -58,13 +58,13 @@ function PropertyRow({ property }: { property: Property }) {
 
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
-              <Link href={`/user/property/${property.id}/edit`}>
+              <Link href={`/property/${property.id}/edit`}>
                 <Edit className="w-3 h-3 mr-1" />
                 Edit
               </Link>
             </Button>
             <Button asChild size="sm">
-              <Link href={`/user/property/${property.id}`}>View Details</Link>
+              <Link href={`/property/${property.id}`}>View</Link>
             </Button>
             {property.agreementId ? (
               <Button asChild size="sm">
@@ -113,7 +113,7 @@ export default function ViewUserProperty() {
           </p>
         </div>
         <Button asChild size="sm">
-          <Link href="/user/property/create">
+          <Link href="/property/create">
             <Plus className="w-4 h-4 mr-2" />
             Add Property
           </Link>
@@ -132,7 +132,7 @@ export default function ViewUserProperty() {
             </p>
           </div>
           <Button asChild size="sm" className="mt-2">
-            <Link href="/user/property/create">
+            <Link href="/property/create">
               <Plus className="w-4 h-4 mr-2" />
               Add Property
             </Link>

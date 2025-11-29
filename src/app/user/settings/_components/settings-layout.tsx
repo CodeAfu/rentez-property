@@ -26,7 +26,7 @@ export default function SettingsLayout() {
 
   return (
     <div className="mt-4 p-4">
-      <div className="grid grid-cols-[240px_1fr] gap-2">
+      <div className="grid sm:grid-cols-[240px_1fr] gap-2">
         {/* Left */}
         <Menus />
 

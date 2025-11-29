@@ -26,7 +26,7 @@ export const propertySchema = z.object({
   roomType: z.array(z.string()),
   preferredRaces: z.array(z.string()),
   preferredOccupation: z.array(z.string()),
-  leaseTermCategoryMonths: z.int(),
+  leaseTermCategory: z.array(z.string()),
 });
 
 export type Property = z.infer<typeof propertySchema>;

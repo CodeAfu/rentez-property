@@ -13,8 +13,12 @@ export function PropertyCard({ property }: { property: Property }) {
 
   return (
     <Card className="overflow-hidden transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg">
-      <div className="relative w-full aspect-[16/10] bg-muted">
-        <img src={cover} alt={property.title} className="object-cover" />
+      <div className="relative flex items-center justify-center w-full aspect-16/10 bg-muted">
+        <img
+          src={cover}
+          alt={property.title}
+          className="h-full w-full object-cover"
+        />
       </div>
 
       <CardContent className="space-y-3">
