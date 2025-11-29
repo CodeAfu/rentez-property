@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { motion } from "motion/react"
+import { motion } from "motion/react";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,49 +33,125 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/providers/toast-provider";
+import { MALAYSIAN_STATES, ROOM_TYPES } from "@/lib/consts";
+import { useAuth } from "@/providers/auth-provider";
+import { useRouter, usePathname } from "next/navigation";
+import LoadingSpinner from "@/components/loading-spinner";
+import api from "@/lib/api";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { withAuth } from "@/lib/auth";
 
 const formSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters").max(100, "Title must be less than 100 characters"),
-  description: z.string().min(20, "Description must be at least 20 characters").max(1000, "Description must be less than 1000 characters"),
-  rent: z.string().regex(/^\d+(\.\d{1,2})?$/, "Please enter a valid amount"),
+  title: z
+    .string()
+    .min(5, "Title must be at least 5 characters")
+    .max(100, "Title must be less than 100 characters"),
+  description: z
+    .string()
+    .min(20, "Description must be at least 20 characters")
+    .max(1000, "Description must be less than 1000 characters"),
+  rent: z.number().positive("Rent must be positive"),
   state: z.string().min(1, "Please select a state"),
   city: z.string().min(2, "City is required").max(50, "City name is too long"),
-  address: z.string().min(10, "Address must be at least 10 characters").max(200, "Address is too long"),
+  address: z
+    .string()
+    .min(10, "Address must be at least 10 characters")
+    .max(200, "Address is too long"),
+  depositRequired: z.number().nullable(),
+  billsIncluded: z.object({
+    wifi: z.boolean().nullable(),
+    electricity: z.boolean().nullable(),
+    water: z.boolean().nullable(),
+    gas: z.boolean().nullable(),
+  }),
+  roomType: z.array(z.string()).min(1, "Select at least one room type"),
+  preferredRaces: z.array(z.string()),
+  preferredOccupation: z.array(z.string()),
+  leaseTermCategory: z
+    .array(z.string())
+    .min(1, "Select at least one lease term"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const malaysianStates = [
-  "Johor", "Kedah", "Kelantan", "Malacca", "Negeri Sembilan", "Pahang",
-  "Penang", "Perak", "Perlis", "Sabah", "Sarawak", "Selangor",
-  "Terengganu", "Kuala Lumpur", "Labuan", "Putrajaya"
-];
+const races = ["Malay", "Chinese", "Indian", "Others", "Any"];
+const occupations = ["Student", "Working Professional", "Any"];
+const leaseTerms = ["Short Term", "Long Term", "Flexible"];
 
-const CreateListing = () => {
-  const [images, setImages] = useState<File[]>([]);
+export default function CreateListing() {
+  const [, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+
+  const { isAuthenticating, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const createPropertyMutation = useMutation({
+    mutationFn: withAuth(async (payload: FormValues) => {
+      const response = await api.post("/api/Property", payload);
+      return response.data;
+    }),
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        message: "Your property listing has been created.",
+      });
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error("Submission Error:", error);
+      if (axios.isAxiosError(error)) {
+        toast({
+          title: "Error",
+          message:
+            error?.response?.data?.message ||
+            "Failed to create listing. Please try again.",
+        });
+      }
+    },
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       description: "",
-      rent: "",
+      rent: 0,
       state: "",
       city: "",
       address: "",
+      depositRequired: null,
+      billsIncluded: {
+        wifi: null,
+        electricity: null,
+        water: null,
+        gas: null,
+      },
+      roomType: [],
+      preferredRaces: [],
+      preferredOccupation: [],
+      leaseTermCategory: [],
     },
   });
+
+  // Auth Logic
+  useEffect(() => {
+    if (!isAuthenticating && !isAuthenticated) {
+      router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
+    }
+  }, [isAuthenticated, isAuthenticating, router, pathname]);
 
   const handleImageUpload = (files: FileList | null) => {
     if (!files) return;
 
     const fileArray = Array.from(files);
     const validImages = fileArray.filter((file) =>
-      file.type.startsWith("image/")
+      file.type.startsWith("image/"),
     );
 
     if (validImages.length !== fileArray.length) {
@@ -114,14 +190,43 @@ const CreateListing = () => {
   };
 
   const onSubmit = (data: FormValues) => {
-    console.log("Submitted:", data);
-    console.log("Images:", images);
+    const payload = {
+      title: data.title,
+      description: data.description,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      rent: Number(data.rent), // Ensure number
+      // Send Base64 strings array
+      images: imagePreviews,
 
-    toast({
-      title: "Success!",
-      message: "Your property listing has been created.",
-    });
+      // Handle deposit (ensure null if 0 or empty, or send number)
+      depositRequired: data.depositRequired
+        ? Number(data.depositRequired)
+        : null,
+
+      billsIncluded: {
+        wifi: data.billsIncluded.wifi ?? false,
+        electricity: data.billsIncluded.electricity ?? false,
+        water: data.billsIncluded.water ?? false,
+        gas: data.billsIncluded.gas ?? false,
+      },
+
+      leaseAgreementId: null,
+
+      // Arrays
+      roomType: data.roomType,
+      preferredRaces: data.preferredRaces,
+      preferredOccupation: data.preferredOccupation,
+      leaseTermCategory: data.leaseTermCategory, // Ensure this matches backend expected strings
+    };
+
+    console.log("Submitting Payload:", payload);
+
+    createPropertyMutation.mutate(payload);
   };
+
+  if (isAuthenticating) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-muted/20 py-12 px-4 sm:px-6 lg:px-8">
@@ -133,7 +238,6 @@ const CreateListing = () => {
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {/* PROPERTY DETAILS */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-2xl">Property Details</CardTitle>
@@ -142,7 +246,6 @@ const CreateListing = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Title */}
                 <FormField
                   control={form.control}
                   name="title"
@@ -163,7 +266,6 @@ const CreateListing = () => {
                   )}
                 />
 
-                {/* Description */}
                 <FormField
                   control={form.control}
                   name="description"
@@ -173,7 +275,7 @@ const CreateListing = () => {
                       <FormControl>
                         <Textarea
                           placeholder="Describe the unit, facilities, surroundings..."
-                          className="min-h-[160px] resize-none"
+                          className="min-h-40 resize-none"
                           {...field}
                         />
                       </FormControl>
@@ -182,23 +284,88 @@ const CreateListing = () => {
                   )}
                 />
 
-                {/* Rent */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="rent"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Monthly Rent (RM)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="1800"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="depositRequired"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Deposit (RM) - Optional</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="1800"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value ? Number(e.target.value) : null,
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
-                  name="rent"
-                  render={({ field }) => (
+                  name="roomType"
+                  render={() => (
                     <FormItem>
-                      <FormLabel>Monthly Rent (RM)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Example: 1800"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter the price in Malaysian Ringgit
-                      </FormDescription>
+                      <FormLabel>Room Type</FormLabel>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {ROOM_TYPES.map((type) => (
+                          <FormField
+                            key={type}
+                            control={form.control}
+                            name="roomType"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(type)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, type])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (val) => val !== type,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer">
+                                  {type}
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -206,15 +373,186 @@ const CreateListing = () => {
               </CardContent>
             </Card>
 
-            {/* LOCATION INFORMATION */}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-2xl">Bills & Utilities</CardTitle>
+                <CardDescription>
+                  Which bills are included in the rent?
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {(["wifi", "electricity", "water", "gas"] as const).map(
+                    (bill) => (
+                      <FormField
+                        key={bill}
+                        control={form.control}
+                        name={`billsIncluded.${bill}`}
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value ?? false}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel className="capitalize font-normal cursor-pointer">
+                              {bill}
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    ),
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-2xl">Tenant Preferences</CardTitle>
+                <CardDescription>
+                  Specify your tenant preferences (optional)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="preferredRaces"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Preferred Race</FormLabel>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {races.map((race) => (
+                          <FormField
+                            key={race}
+                            control={form.control}
+                            name="preferredRaces"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(race)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, race])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (val) => val !== race,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer">
+                                  {race}
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="preferredOccupation"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Preferred Occupation</FormLabel>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {occupations.map((occupation) => (
+                          <FormField
+                            key={occupation}
+                            control={form.control}
+                            name="preferredOccupation"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(occupation)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([
+                                            ...field.value,
+                                            occupation,
+                                          ])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (val) => val !== occupation,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer">
+                                  {occupation}
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="leaseTermCategory"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Lease Term</FormLabel>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {leaseTerms.map((term) => (
+                          <FormField
+                            key={term}
+                            control={form.control}
+                            name="leaseTermCategory"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(term)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, term])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (val) => val !== term,
+                                            ),
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer">
+                                  {term}
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-2xl">Location Information</CardTitle>
-                <CardDescription>Where is your property located?</CardDescription>
+                <CardDescription>
+                  Where is your property located?
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* State */}
                   <FormField
                     control={form.control}
                     name="state"
@@ -231,7 +569,7 @@ const CreateListing = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {malaysianStates.map((state) => (
+                            {MALAYSIAN_STATES.map((state) => (
                               <SelectItem key={state} value={state}>
                                 {state}
                               </SelectItem>
@@ -243,7 +581,6 @@ const CreateListing = () => {
                     )}
                   />
 
-                  {/* City */}
                   <FormField
                     control={form.control}
                     name="city"
@@ -261,7 +598,6 @@ const CreateListing = () => {
 
                 <Separator />
 
-                {/* Address */}
                 <FormField
                   control={form.control}
                   name="address"
@@ -282,7 +618,6 @@ const CreateListing = () => {
               </CardContent>
             </Card>
 
-            {/* IMAGE UPLOAD */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="text-2xl">Property Images</CardTitle>
@@ -328,7 +663,6 @@ const CreateListing = () => {
                   </label>
                 </div>
 
-                {/* Preview Grid */}
                 {imagePreviews.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -345,6 +679,7 @@ const CreateListing = () => {
                       >
                         <img
                           src={preview}
+                          alt={`Property preview ${index + 1}`}
                           className="w-full h-full object-cover rounded-xl border shadow-sm"
                         />
 
@@ -362,7 +697,6 @@ const CreateListing = () => {
               </CardContent>
             </Card>
 
-            {/* SUBMIT BUTTON */}
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 type="submit"
@@ -377,6 +711,4 @@ const CreateListing = () => {
       </motion.div>
     </div>
   );
-};
-
-export default CreateListing;
+}
