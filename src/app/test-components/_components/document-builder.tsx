@@ -6,16 +6,21 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
 
-const fetchBuilderToken = withAuth(async () => {
-  const response = await api.post("api/docuseal/builder-token");
+const fetchBuilderToken = withAuth(async (templateId: string | undefined) => {
+  const templateIdString = templateId && `?templateId=${templateId}`;
+  const response = await api.post(`/docuseal/builder-token${templateIdString}`);
   console.log(response.data.token);
   return response.data;
 });
 
-export default function DocumentBuilder() {
+interface DocumentBuilderProps {
+  templateId: string;
+}
+
+export default function DocumentBuilder({ templateId }: DocumentBuilderProps) {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["builder-token"],
-    queryFn: fetchBuilderToken,
+    queryFn: () => fetchBuilderToken(templateId),
   });
 
   if (!data) return null;
