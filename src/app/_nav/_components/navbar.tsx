@@ -20,7 +20,7 @@ const routes: Routes = [
   {
     label: "Test",
     href: "/test-components",
-    // devOnly: true,
+    devOnly: true,
   },
   {
     label: "Not Found",

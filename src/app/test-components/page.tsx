@@ -4,7 +4,6 @@ import DocumentView from "./_components/document-view";
 import DocumentSubmit from "./_components/document-submit";
 import ComponentDisplay from "./_components/component-display";
 import ColorShowcase from "@/components/color-showcase";
-import DocumentBuilder from "./_components/document-builder";
 
 export default function TestPage() {
   // if (process.env.NODE_ENV !== "development") return notFound();
@@ -23,7 +22,7 @@ export default function TestPage() {
         display={false}
         title="DocuSeal Document Builder (Embedded, Paid Feature?)"
       >
-        <DocumentBuilder />
+        <div>See user profile to view</div>
       </ComponentDisplay>
       <ComponentDisplay
         display={false}
