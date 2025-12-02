@@ -29,7 +29,7 @@ export default function DocumentBuilder({
   templateId,
 }: DocumentBuilderProps) {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["builder-token", propertyId],
+    queryKey: ["builder-token", propertyId, templateId],
     queryFn: () => fetchBuilderToken(propertyId, templateId),
   });
 
