@@ -95,7 +95,7 @@ export default function CreateListing() {
         title: "Success!",
         message: "Your property listing has been created.",
       });
-      router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       console.error("Submission Error:", error);
