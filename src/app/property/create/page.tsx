@@ -23,15 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/providers/toast-provider";
@@ -93,7 +85,9 @@ export default function CreateListing() {
 
   const createPropertyMutation = useMutation({
     mutationFn: withAuth(async (payload: FormValues) => {
+      console.log("API Payload:", payload);
       const response = await api.post("/api/Property", payload);
+      console.log("API Response:", response.data);
       return response.data;
     }),
     onSuccess: () => {
@@ -190,6 +184,7 @@ export default function CreateListing() {
   };
 
   const onSubmit = (data: FormValues) => {
+    console.log("Form Data:", data);
     const payload = {
       title: data.title,
       description: data.description,
@@ -236,7 +231,6 @@ export default function CreateListing() {
         transition={{ duration: 0.45 }}
         className="max-w-5xl mx-auto"
       >
-        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Card className="shadow-sm">
               <CardHeader>
@@ -246,130 +240,104 @@ export default function CreateListing() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Property Title</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Cozy Studio Apartment in KL Sentral"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        A good title increases visibility
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe the unit, facilities, surroundings..."
-                          className="min-h-40 resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="rent"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Monthly Rent (RM)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="1800"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Property Title</Label>
+                  <Input
+                    id="title"
+                    placeholder="e.g., Cozy Studio Apartment in KL Sentral"
+                    {...form.register("title")}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="depositRequired"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Deposit (RM) - Optional</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="1800"
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value ? Number(e.target.value) : null,
-                              )
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <p className="text-muted-foreground text-sm">
+                    A good title increases visibility
+                  </p>
+                  {form.formState.errors.title && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.title.message}
+                    </p>
+                  )}
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="roomType"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Room Type</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {ROOM_TYPES.map((type) => (
-                          <FormField
-                            key={type}
-                            control={form.control}
-                            name="roomType"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(type)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, type])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (val) => val !== type,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  {type}
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe the unit, facilities, surroundings..."
+                    className="min-h-40 resize-none"
+                    {...form.register("description")}
+                  />
+                  {form.formState.errors.description && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.description.message}
+                    </p>
                   )}
-                />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="rent">Monthly Rent (RM)</Label>
+                    <Input
+                      id="rent"
+                      type="number"
+                      placeholder="1800"
+                      {...form.register("rent", { valueAsNumber: true })}
+                    />
+                    {form.formState.errors.rent && (
+                      <p className="text-destructive text-sm">
+                        {form.formState.errors.rent.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="depositRequired">Deposit (RM) - Optional</Label>
+                    <Input
+                      id="depositRequired"
+                      type="number"
+                      placeholder="1800"
+                      {...form.register("depositRequired", { 
+                        setValueAs: (v) => v === "" ? null : Number(v)
+                      })}
+                    />
+                    {form.formState.errors.depositRequired && (
+                      <p className="text-destructive text-sm">
+                        {form.formState.errors.depositRequired.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Room Type</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {ROOM_TYPES.map((type) => {
+                      const roomTypeValue = form.watch("roomType") || [];
+                      return (
+                        <div key={type} className="flex items-center space-x-2 space-y-0">
+                          <Checkbox
+                            id={`roomType-${type}`}
+                            checked={roomTypeValue.includes(type)}
+                            onCheckedChange={(checked) => {
+                              const current = form.getValues("roomType") || [];
+                              if (checked) {
+                                form.setValue("roomType", [...current, type]);
+                              } else {
+                                form.setValue("roomType", current.filter((val) => val !== type));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`roomType-${type}`} className="font-normal cursor-pointer">
+                            {type}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {form.formState.errors.roomType && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.roomType.message}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -382,28 +350,23 @@ export default function CreateListing() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {(["wifi", "electricity", "water", "gas"] as const).map(
-                    (bill) => (
-                      <FormField
-                        key={bill}
-                        control={form.control}
-                        name={`billsIncluded.${bill}`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center space-x-2 space-y-0">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value ?? false}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormLabel className="capitalize font-normal cursor-pointer">
-                              {bill}
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    ),
-                  )}
+                  {(["wifi", "electricity", "water", "gas"] as const).map((bill) => {
+                    const billValue = form.watch(`billsIncluded.${bill}`);
+                    return (
+                      <div key={bill} className="flex items-center space-x-2 space-y-0">
+                        <Checkbox
+                          id={`bill-${bill}`}
+                          checked={billValue ?? false}
+                          onCheckedChange={(checked) => {
+                            form.setValue(`billsIncluded.${bill}`, checked as boolean);
+                          }}
+                        />
+                        <Label htmlFor={`bill-${bill}`} className="capitalize font-normal cursor-pointer">
+                          {bill}
+                        </Label>
+                      </div>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -416,131 +379,104 @@ export default function CreateListing() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="preferredRaces"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Preferred Race</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {races.map((race) => (
-                          <FormField
-                            key={race}
-                            control={form.control}
-                            name="preferredRaces"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(race)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, race])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (val) => val !== race,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  {race}
-                                </FormLabel>
-                              </FormItem>
-                            )}
+                <div className="grid gap-2">
+                  <Label>Preferred Race</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {races.map((race) => {
+                      const racesValue = form.watch("preferredRaces") || [];
+                      return (
+                        <div key={race} className="flex items-center space-x-2 space-y-0">
+                          <Checkbox
+                            id={`race-${race}`}
+                            checked={racesValue.includes(race)}
+                            onCheckedChange={(checked) => {
+                              const current = form.getValues("preferredRaces") || [];
+                              if (checked) {
+                                form.setValue("preferredRaces", [...current, race]);
+                              } else {
+                                form.setValue("preferredRaces", current.filter((val) => val !== race));
+                              }
+                            }}
                           />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
+                          <Label htmlFor={`race-${race}`} className="font-normal cursor-pointer">
+                            {race}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {form.formState.errors.preferredRaces && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.preferredRaces.message}
+                    </p>
                   )}
-                />
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="preferredOccupation"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Preferred Occupation</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {occupations.map((occupation) => (
-                          <FormField
-                            key={occupation}
-                            control={form.control}
-                            name="preferredOccupation"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(occupation)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([
-                                            ...field.value,
-                                            occupation,
-                                          ])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (val) => val !== occupation,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  {occupation}
-                                </FormLabel>
-                              </FormItem>
-                            )}
+                <div className="grid gap-2">
+                  <Label>Preferred Occupation</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {occupations.map((occupation) => {
+                      const occupationsValue = form.watch("preferredOccupation") || [];
+                      return (
+                        <div key={occupation} className="flex items-center space-x-2 space-y-0">
+                          <Checkbox
+                            id={`occupation-${occupation}`}
+                            checked={occupationsValue.includes(occupation)}
+                            onCheckedChange={(checked) => {
+                              const current = form.getValues("preferredOccupation") || [];
+                              if (checked) {
+                                form.setValue("preferredOccupation", [...current, occupation]);
+                              } else {
+                                form.setValue("preferredOccupation", current.filter((val) => val !== occupation));
+                              }
+                            }}
                           />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
+                          <Label htmlFor={`occupation-${occupation}`} className="font-normal cursor-pointer">
+                            {occupation}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {form.formState.errors.preferredOccupation && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.preferredOccupation.message}
+                    </p>
                   )}
-                />
+                </div>
 
-                <FormField
-                  control={form.control}
-                  name="leaseTermCategory"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Lease Term</FormLabel>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {leaseTerms.map((term) => (
-                          <FormField
-                            key={term}
-                            control={form.control}
-                            name="leaseTermCategory"
-                            render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(term)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...field.value, term])
-                                        : field.onChange(
-                                            field.value?.filter(
-                                              (val) => val !== term,
-                                            ),
-                                          );
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer">
-                                  {term}
-                                </FormLabel>
-                              </FormItem>
-                            )}
+                <div className="grid gap-2">
+                  <Label>Lease Term</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {leaseTerms.map((term) => {
+                      const leaseTermsValue = form.watch("leaseTermCategory") || [];
+                      return (
+                        <div key={term} className="flex items-center space-x-2 space-y-0">
+                          <Checkbox
+                            id={`leaseTerm-${term}`}
+                            checked={leaseTermsValue.includes(term)}
+                            onCheckedChange={(checked) => {
+                              const current = form.getValues("leaseTermCategory") || [];
+                              if (checked) {
+                                form.setValue("leaseTermCategory", [...current, term]);
+                              } else {
+                                form.setValue("leaseTermCategory", current.filter((val) => val !== term));
+                              }
+                            }}
                           />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
+                          <Label htmlFor={`leaseTerm-${term}`} className="font-normal cursor-pointer">
+                            {term}
+                          </Label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {form.formState.errors.leaseTermCategory && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.leaseTermCategory.message}
+                    </p>
                   )}
-                />
+                </div>
               </CardContent>
             </Card>
 
@@ -553,68 +489,61 @@ export default function CreateListing() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select state" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {MALAYSIAN_STATES.map((state) => (
-                              <SelectItem key={state} value={state}>
-                                {state}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="grid gap-2">
+                    <Label htmlFor="state">State</Label>
+                    <Select
+                      value={form.watch("state")}
+                      onValueChange={(value) => form.setValue("state", value)}
+                    >
+                      <SelectTrigger id="state">
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {MALAYSIAN_STATES.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {form.formState.errors.state && (
+                      <p className="text-destructive text-sm">
+                        {form.formState.errors.state.message}
+                      </p>
                     )}
-                  />
+                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Petaling Jaya" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="grid gap-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input 
+                      id="city"
+                      placeholder="e.g., Petaling Jaya" 
+                      {...form.register("city")} 
+                    />
+                    {form.formState.errors.city && (
+                      <p className="text-destructive text-sm">
+                        {form.formState.errors.city.message}
+                      </p>
                     )}
-                  />
+                  </div>
                 </div>
 
                 <Separator />
 
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Address</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Include street name, building, and unit number"
-                          className="resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Full Address</Label>
+                  <Textarea
+                    id="address"
+                    placeholder="Include street name, building, and unit number"
+                    className="resize-none"
+                    {...form.register("address")}
+                  />
+                  {form.formState.errors.address && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.address.message}
+                    </p>
                   )}
-                />
+                </div>
               </CardContent>
             </Card>
 
@@ -707,7 +636,6 @@ export default function CreateListing() {
               </Button>
             </motion.div>
           </form>
-        </Form>
       </motion.div>
     </div>
   );

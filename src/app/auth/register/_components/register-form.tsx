@@ -19,7 +19,9 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 const registerApi = async (data: RegisterFormData) => {
+  console.log("Register API Call with Data:", data);
   const response = await api.post("/api/auth/register", data);
+  console.log("Register API Response (registerApi):", response);
   return response;
 };
 
@@ -46,7 +48,9 @@ export default function RegisterForm() {
     onError: (error) => {
       if (axios.isAxiosError(error)) {
         const devEnv = process.env.NODE_ENV === "development";
+        console.log("Dotnet Error:", devEnv); // this is true
         const backendData = error.response?.data || {};
+        console.log("Backend Data:", backendData);
         const message = devEnv ? backendData.error : backendData.message;
 
         console.error("Login Error:", message);
