@@ -2,7 +2,7 @@
 
 import LoadingSpinner from "@/components/loading-spinner";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   MapPin,
   CheckCircle2,
@@ -11,10 +11,14 @@ import {
   Home,
   Users,
 } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { PropertyImageCarousel } from "./property-image-carousel";
 import { Button } from "@/components/ui/button";
 import { getPropertyByIdQueryOptions } from "@/queries/get-property-by-id";
+import api from "@/lib/api";
+import { withAuth } from "@/lib/auth";
+import { useToast } from "@/providers/toast-provider";
+import axios from "axios";
 
 interface ViewPropertyLayoutProps {
   propertyId: string;
@@ -23,9 +27,50 @@ interface ViewPropertyLayoutProps {
 export default function ViewPropertyLayout({
   propertyId,
 }: ViewPropertyLayoutProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const { data: property, isLoading } = useQuery({
     ...getPropertyByIdQueryOptions(propertyId),
     enabled: !!propertyId,
+  });
+
+  const applyPropertyMutation = useMutation({
+    mutationFn: withAuth(async () => {
+      const response = await api.post(
+        `/api/Users/apply-property?propertyId=${propertyId}`
+      );
+      return response.data;
+    }),
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        message: "Your application has been submitted.",
+      });
+    },
+    onError: (error) => {
+      console.error("Application Error:", error);
+      if (axios.isAxiosError(error)) {
+        const responseData = error.response?.data;
+        console.log("API Error Response Data:", responseData);
+        
+        // Check if profile is incomplete and needs redirect
+        if (responseData?.profileIncomplete && responseData?.redirectTo) {
+          router.push(responseData.redirectTo);
+          toast({
+            title: "Profile Incomplete",
+            message: responseData.message || "Please complete your profile first.",
+          });
+        } else {
+          toast({
+            title: "Error",
+            message:
+              responseData?.message ||
+              "Failed to submit application. Please try again.",
+          });
+        }
+      }
+    },
   });
 
   if (isLoading) return <LoadingSpinner />;
@@ -37,6 +82,7 @@ export default function ViewPropertyLayout({
   const includedBills = Object.entries(property.billsIncluded ?? {})
     .filter(([, included]) => included)
     .map(([name]) => name);
+
 
   return (
     <div className="container mx-auto px-4">
@@ -156,8 +202,13 @@ export default function ViewPropertyLayout({
               </div>
             </div>
 
-            <Button className="w-full h-12 text-lg" size="lg">
-              Contact Owner
+            <Button 
+              onClick={() => applyPropertyMutation.mutate()}
+              disabled={applyPropertyMutation.isPending}
+              className="w-full h-12 text-lg" 
+              size="lg"
+            >
+              {applyPropertyMutation.isPending ? "Submitting..." : "Rent this Property"}
             </Button>
           </div>
         </div>

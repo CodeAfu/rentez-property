@@ -184,7 +184,6 @@ export default function CreateListing() {
   };
 
   const onSubmit = (data: FormValues) => {
-    console.log("Form Data:", data);
     const payload = {
       title: data.title,
       description: data.description,

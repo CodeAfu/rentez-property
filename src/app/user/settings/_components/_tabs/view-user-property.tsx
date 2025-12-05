@@ -81,6 +81,9 @@ function PropertyRow({ property }: { property: Property }) {
                 </Link>
               </Button>
             )}
+            <Button asChild size="sm">
+              <Link href={`/property/${property.id}`}>Check The People who Applied</Link>
+            </Button>
           </div>
         </div>
       </div>
