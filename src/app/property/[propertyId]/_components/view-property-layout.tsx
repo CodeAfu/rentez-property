@@ -53,7 +53,7 @@ export default function ViewPropertyLayout({
       if (axios.isAxiosError(error)) {
         const responseData = error.response?.data;
         console.log("API Error Response Data:", responseData);
-        
+
         // Check if profile is incomplete and needs redirect
         if (responseData?.profileIncomplete && responseData?.redirectTo) {
           router.push(responseData.redirectTo);
@@ -202,10 +202,10 @@ export default function ViewPropertyLayout({
               </div>
             </div>
 
-            <Button 
+            <Button
               onClick={() => applyPropertyMutation.mutate()}
               disabled={applyPropertyMutation.isPending}
-              className="w-full h-12 text-lg" 
+              className="w-full h-12 text-lg"
               size="lg"
             >
               {applyPropertyMutation.isPending ? "Submitting..." : "Rent this Property"}

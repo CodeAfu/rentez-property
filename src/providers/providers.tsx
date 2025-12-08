@@ -15,7 +15,7 @@ export default function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       <QueryProvider>
-        <ToastProvider timeout={3000}>
+        <ToastProvider timeout={5000}>
           <AuthProvider>{children}</AuthProvider>
         </ToastProvider>
       </QueryProvider>

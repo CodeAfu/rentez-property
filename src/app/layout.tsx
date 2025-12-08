@@ -7,6 +7,7 @@ import { ToggleTheme } from "@/components/toggle-theme";
 import Navbar from "./_nav/_components/navbar";
 import Footer from "./_components/footer";
 import Providers from "@/providers/providers";
+import ScreenSizeIndicator from "@/components/screen-size-indicator";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <ToggleTheme />
+          <ScreenSizeIndicator />
         </Providers>
       </body>
     </html>
