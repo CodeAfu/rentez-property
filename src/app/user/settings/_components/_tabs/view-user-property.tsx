@@ -82,7 +82,7 @@ function PropertyRow({ property }: { property: Property }) {
               </Button>
             )}
             <Button asChild size="sm">
-              <Link href={`/property/${property.id}`}>Check The People who Applied</Link>
+              <Link href={`/property/${property.id}/applicants`}>Check The People who Applied</Link>
             </Button>
           </div>
         </div>
