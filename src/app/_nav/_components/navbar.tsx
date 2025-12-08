@@ -3,6 +3,7 @@ import Auth from "@/app/auth/_components/auth";
 import NavButton from "./nav-button";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const routes: Routes = [
   {

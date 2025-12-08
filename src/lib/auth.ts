@@ -39,7 +39,7 @@ export const withAuth = <T extends unknown[], R>(
           typeof decoded.exp === "number"
             ? decoded.exp
             : Math.floor(new Date(decoded.exp).getTime() / 1000);
-            
+
         if (expTimestamp >= now) {
           return await func(...args);
         }
@@ -56,4 +56,4 @@ export const withAuth = <T extends unknown[], R>(
     }
   };
 };
-  
+

@@ -1,10 +1,12 @@
 "use client";
 
 import { DocusealBuilder } from "@docuseal/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
+import { cn, devLog, logApiErr } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const fetchBuilderToken = withAuth(
   async (propertyId?: string, templateId?: string) => {
@@ -19,27 +21,74 @@ const fetchBuilderToken = withAuth(
   },
 );
 
+const handleSaveChanges = withAuth(async (data: unknown, propertyId: string, templateId?: string) => {
+  devLog("Save Data:", data);
+  if (!templateId) throw new Error(`Param missing: templateId=${templateId}`)
+  const response = await api.post(`/api/docuseal/save-lease?propertyId=${propertyId}&templateId=${templateId}`, data);
+  return response.data;
+});
+
+const handleCreateLease = withAuth(async (data: unknown, propertyId: string) => {
+  devLog("Create Data:", data);
+  const response = await api.post(`/api/docuseal/create-lease?propertyId=${propertyId}`, data);
+  return response.data;
+})
+
 interface DocumentBuilderProps {
   propertyId: string;
   templateId?: string;
+  mode: "create" | "edit";
 }
 
 export default function DocumentBuilder({
   propertyId,
   templateId,
+  mode,
 }: DocumentBuilderProps) {
+  const router = useRouter();
+
+  const { mutate: createMutation } = useMutation({
+    mutationFn: (data) => handleCreateLease(data, propertyId),
+    onSuccess: (response) => {
+      devLog("Agreement Created!");
+      router.push(`/property/${propertyId}/lease/${response.templateId}`);
+    },
+    onError: (err) => {
+      logApiErr(err);
+    }
+  });
+
+  const { mutate: saveMutation } = useMutation({
+    mutationFn: (data) => handleSaveChanges(data, propertyId, templateId!),
+    onSuccess: () => {
+      devLog("Agreement Saved")
+    },
+    onError: (err) => {
+      logApiErr(err);
+    }
+  });
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["builder-token", propertyId, templateId],
     queryFn: () => fetchBuilderToken(propertyId, templateId),
   });
 
-  console.log(data);
-
   return (
-    <div className="relative max-w-6xl h-[calc(100dvh-4rem)] mx-auto overflow-y-scroll bg-slate-200">
-      {isLoading && <LoadingSpinner />}
-      {isError && <div className="text-red-500">{error.message}</div>}
-      {data && <DocusealBuilder token={data.token.result} />}
+    <div className="px-2">
+      <div className="h-[calc(100dvh-4rem)] overflow-y-scroll bg-slate-200">
+        {isLoading && <LoadingSpinner text="Loading..." />}
+        {!templateId && <LoadingSpinner text="Creating Template..." />}
+        {isError && <div className="text-red-500">{error.message}</div>}
+        {data && (
+          <div className={cn("w-full h-full", !templateId && "hidden")}>
+            <DocusealBuilder
+              token={data.token.result}
+              onSave={(data) => mode === "edit" ? saveMutation(data) : createMutation(data)}
+              onLoad={(data) => mode === "create" ? createMutation(data) : undefined}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
