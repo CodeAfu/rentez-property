@@ -52,12 +52,7 @@ const formSchema = z.object({
     .string()
     .min(10, "Address must be at least 10 characters")
     .max(200, "Address is too long"),
-<<<<<<< HEAD
   deposit: z.number().nullable(),
-=======
-  depositRequired: z.number().nullable(),
-  deposit: z.boolean(),
->>>>>>> 4146e50 (delete property)
   billsIncluded: z.object({
     wifi: z.boolean().nullable(),
     electricity: z.boolean().nullable(),
@@ -126,12 +121,7 @@ export default function CreateListing() {
       state: "",
       city: "",
       address: "",
-<<<<<<< HEAD
       deposit: null,
-=======
-      depositRequired: null,
-      deposit: false,
->>>>>>> 4146e50 (delete property)
       billsIncluded: {
         wifi: null,
         electricity: null,
@@ -207,16 +197,11 @@ export default function CreateListing() {
       images: imagePreviews,
 
       // Handle deposit (ensure null if 0 or empty, or send number)
-<<<<<<< HEAD
       deposit: data.deposit
         ? Number(data.deposit)
-=======
-      deposit: data.depositRequired
-        ? Number(data.depositRequired)
->>>>>>> 4146e50 (delete property)
         : null,
 
-      depositRequired: data.depositRequired && Number(data.depositRequired) > 0 ? true : false,
+      depositRequired: data.deposit && Number(data.deposit) > 0 ? true : false,
 
       billsIncluded: {
         wifi: data.billsIncluded.wifi ?? false,

@@ -46,8 +46,7 @@ export default function DocumentBuilder({
   mode,
 }: DocumentBuilderProps) {
   const router = useRouter();
-
-  const { mutate: createMutation } = useMutation({
+  const { mutate: createMutation, isError: isCreateError, error: createError } = useMutation({
     mutationFn: (data) => handleCreateLease(data, propertyId),
     onSuccess: (response) => {
       devLog("Agreement Created!");
@@ -58,7 +57,7 @@ export default function DocumentBuilder({
     }
   });
 
-  const { mutate: saveMutation } = useMutation({
+  const { mutate: saveMutation, isError: isSaveError, error: saveError } = useMutation({
     mutationFn: (data) => handleSaveChanges(data, propertyId, templateId!),
     onSuccess: () => {
       devLog("Agreement Saved")
@@ -79,10 +78,14 @@ export default function DocumentBuilder({
         {isLoading && <LoadingSpinner text="Loading..." />}
         {!templateId && <LoadingSpinner text="Creating Template..." />}
         {isError && <div className="text-red-500">{error.message}</div>}
+        {isCreateError && <div className="text-red-500">{createError.message}</div>}
+        {isSaveError && <div className="text-red-500">{saveError.message}</div>}
         {data && (
           <div className={cn("w-full h-full", !templateId && "hidden")}>
             <DocusealBuilder
               token={data.token.result}
+              withSendButton={false}
+              withSignYourselfButton={false}
               onSave={(data) => mode === "edit" ? saveMutation(data) : createMutation(data)}
               onLoad={(data) => mode === "create" ? createMutation(data) : undefined}
             />

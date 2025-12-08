@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit, MapPin, DollarSign, Home, Calendar, Trash2 } from "lucide-react";
+import { Plus, Edit, MapPin, Home, Calendar, Trash2 } from "lucide-react";
 import Link from "next/link";
 import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserPropertyOptions } from "@/queries/get-current-user-property-query";
@@ -28,18 +28,18 @@ function PropertyRow({ property }: { property: Property }) {
   const queryClient = useQueryClient();
 
   // Fetch applications for the property
-    const {
-      data: applications = [],
-    } = useQuery<PropertyApplication[]>({
-      queryKey: ["property-applications", property.id],
-      queryFn: withAuth(async () => {
-        const response = await api.get(
-          `/api/PropertyApplications/property/${property.id}`
-        );
-        return response.data;
-      }),
-      enabled: !!property.id,
-    });
+  const {
+    data: applications = [],
+  } = useQuery<PropertyApplication[]>({
+    queryKey: ["property-applications", property.id],
+    queryFn: withAuth(async () => {
+      const response = await api.get(
+        `/api/PropertyApplications/property/${property.id}`
+      );
+      return response.data;
+    }),
+    enabled: !!property.id,
+  });
 
   // Delete property mutation
   const deletePropertyMutation = useMutation({
@@ -84,8 +84,7 @@ function PropertyRow({ property }: { property: Property }) {
           <div className="flex justify-between items-start gap-4 mb-2">
             <h3 className="font-semibold text-lg truncate">{property.title}</h3>
             <div className="flex items-center gap-1 text-lg font-bold text-primary whitespace-nowrap">
-              <DollarSign className="w-4 h-4" />
-              {property.rent}/mo
+              RM {property.rent}/mo
             </div>
           </div>
 
@@ -142,8 +141,8 @@ function PropertyRow({ property }: { property: Property }) {
                 Applicants {applications.length > 0 && `(${applications.length})`}
               </Link>
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               size="sm"
               onClick={handleDelete}
               disabled={deletePropertyMutation.isPending}

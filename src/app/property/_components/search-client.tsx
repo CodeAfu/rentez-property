@@ -15,7 +15,7 @@ import Link from "next/link";
 // 1. Schema Definition
 const searchSchema = z.object({
   pageNum: z.coerce.number().int().default(1),
-  lim: z.coerce.number().int().default(10),
+  lim: z.coerce.number().int().default(12),
   search: z.string().optional(),
   ownerName: z.string().optional(),
   roomTypes: z.array(z.string()).optional(),
