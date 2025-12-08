@@ -7,9 +7,36 @@ import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserPropertyOptions } from "@/queries/get-current-user-property-query";
 import { Property } from "@/types/property";
 import { devOut } from "@/lib/utils";
+import { withAuth } from "@/lib/auth";
+import api from "@/lib/api";
+
+interface PropertyApplication {
+  id: string;
+  propertyId: string;
+  propertyTitle: string;
+  propertyAddress: string;
+  applicantUserId: string;
+  applicantName: string;
+  applicantEmail: string;
+  createdAt: string;
+}
 
 function PropertyRow({ property }: { property: Property }) {
   const primaryImage = property.images?.[0] || "/placeholder-property.jpg";
+
+  // Fetch applications for the property
+    const {
+      data: applications = [],
+    } = useQuery<PropertyApplication[]>({
+      queryKey: ["property-applications", property.id],
+      queryFn: withAuth(async () => {
+        const response = await api.get(
+          `/api/PropertyApplications/property/${property.id}`
+        );
+        return response.data;
+      }),
+      enabled: !!property.id,
+    });
 
   return (
     <div className="border rounded-lg p-4 hover:bg-accent/5 transition">
@@ -82,7 +109,9 @@ function PropertyRow({ property }: { property: Property }) {
               </Button>
             )}
             <Button asChild size="sm">
-              <Link href={`/property/${property.id}/applicants`}>Check The People who Applied</Link>
+              <Link href={`/property/${property.id}/applicants`}>
+                Applicants {applications.length > 0 && `(${applications.length})`}
+              </Link>
             </Button>
           </div>
         </div>
