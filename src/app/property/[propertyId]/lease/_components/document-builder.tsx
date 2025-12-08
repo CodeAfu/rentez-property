@@ -57,7 +57,7 @@ export default function DocumentBuilder({
 
   return (
     <div>
-      <div className="max-w-6xl h-[calc(100dvh-4rem)] mx-auto overflow-y-scroll bg-slate-200">
+      <div className="h-[calc(100dvh-4rem)] overflow-y-scroll bg-slate-200">
         {isLoading && <LoadingSpinner text="Loading Document..." />}
         {isError && <div className="text-red-500">{error.message}</div>}
         {data && <DocusealBuilder

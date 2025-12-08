@@ -13,8 +13,10 @@ export default async function LeasePage({ params }: LeasePageProps) {
   });
   return (
     <div className="container mx-auto my-8 min-h-[calc(100dvh-4rem)]">
-      <DocumentBuilder propertyId={propertyId} templateId={templateId} />
-      <SubmissionsList propertyId={propertyId} templateId={templateId} />
+      <div className="grid xl:grid-cols-[1fr_24rem] gap-4">
+        <DocumentBuilder propertyId={propertyId} templateId={templateId} />
+        <SubmissionsList propertyId={propertyId} templateId={templateId} />
+      </div>
     </div>
   );
 }

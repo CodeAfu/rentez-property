@@ -15,10 +15,10 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
   });
 
   return (
-    <div className="sm:mt-8 mt-4 bg-card shadow p-4 max-w-6xl mx-auto mb-12">
+    <div className="bg-card shadow p-4 max-w-6xl w-full h-fit">
       {isLoading ? <LoadingSpinner /> : (
-        <div>
-          <h1 className="text-2xl font-semibold pb-2 mb-4 border-b border-b-border/50">Submissions</h1>
+        <div className="text-sm">
+          <h1 className="text-xl font-semibold pb-2 mb-4 border-b border-b-border/50">Submissions</h1>
           {data ? (
             <div>Data</div>
           ) : (
