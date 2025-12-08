@@ -52,7 +52,7 @@ const formSchema = z.object({
     .string()
     .min(10, "Address must be at least 10 characters")
     .max(200, "Address is too long"),
-  depositRequired: z.number().nullable(),
+  deposit: z.number().nullable(),
   billsIncluded: z.object({
     wifi: z.boolean().nullable(),
     electricity: z.boolean().nullable(),
@@ -98,7 +98,6 @@ export default function CreateListing() {
       router.push("/");
     },
     onError: (error) => {
-      console.error("Submission Error:", error);
       if (axios.isAxiosError(error)) {
         toast({
           title: "Error",
@@ -106,6 +105,9 @@ export default function CreateListing() {
             error?.response?.data?.message ||
             "Failed to create listing. Please try again.",
         });
+        console.error(error.response?.data?.errors);
+      } else {
+        console.error(error.message)
       }
     },
   });
@@ -119,7 +121,7 @@ export default function CreateListing() {
       state: "",
       city: "",
       address: "",
-      depositRequired: null,
+      deposit: null,
       billsIncluded: {
         wifi: null,
         electricity: null,
@@ -195,8 +197,8 @@ export default function CreateListing() {
       images: imagePreviews,
 
       // Handle deposit (ensure null if 0 or empty, or send number)
-      depositRequired: data.depositRequired
-        ? Number(data.depositRequired)
+      deposit: data.deposit
+        ? Number(data.deposit)
         : null,
 
       billsIncluded: {
@@ -230,411 +232,410 @@ export default function CreateListing() {
         transition={{ duration: 0.45 }}
         className="max-w-5xl mx-auto"
       >
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Property Details</CardTitle>
-                <CardDescription>
-                  Provide essential details about your property
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Property Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Cozy Studio Apartment in KL Sentral"
-                    {...form.register("title")}
-                  />
-                  <p className="text-muted-foreground text-sm">
-                    A good title increases visibility
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Property Details</CardTitle>
+              <CardDescription>
+                Provide essential details about your property
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-2">
+                <Label htmlFor="title">Property Title</Label>
+                <Input
+                  id="title"
+                  placeholder="e.g., Cozy Studio Apartment in KL Sentral"
+                  {...form.register("title")}
+                />
+                <p className="text-muted-foreground text-sm">
+                  A good title increases visibility
+                </p>
+                {form.formState.errors.title && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.title.message}
                   </p>
-                  {form.formState.errors.title && (
-                    <p className="text-destructive text-sm">
-                      {form.formState.errors.title.message}
-                    </p>
-                  )}
-                </div>
+                )}
+              </div>
 
+              <div className="grid gap-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe the unit, facilities, surroundings..."
+                  className="min-h-40 resize-none"
+                  {...form.register("description")}
+                />
+                {form.formState.errors.description && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.description.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe the unit, facilities, surroundings..."
-                    className="min-h-40 resize-none"
-                    {...form.register("description")}
+                  <Label htmlFor="rent">Monthly Rent (RM)</Label>
+                  <Input
+                    id="rent"
+                    type="number"
+                    placeholder="1800"
+                    {...form.register("rent", { valueAsNumber: true })}
                   />
-                  {form.formState.errors.description && (
+                  {form.formState.errors.rent && (
                     <p className="text-destructive text-sm">
-                      {form.formState.errors.description.message}
+                      {form.formState.errors.rent.message}
                     </p>
                   )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="grid gap-2">
-                    <Label htmlFor="rent">Monthly Rent (RM)</Label>
-                    <Input
-                      id="rent"
-                      type="number"
-                      placeholder="1800"
-                      {...form.register("rent", { valueAsNumber: true })}
-                    />
-                    {form.formState.errors.rent && (
-                      <p className="text-destructive text-sm">
-                        {form.formState.errors.rent.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="depositRequired">Deposit (RM) - Optional</Label>
-                    <Input
-                      id="depositRequired"
-                      type="number"
-                      placeholder="1800"
-                      {...form.register("depositRequired", { 
-                        setValueAs: (v) => v === "" ? null : Number(v)
-                      })}
-                    />
-                    {form.formState.errors.depositRequired && (
-                      <p className="text-destructive text-sm">
-                        {form.formState.errors.depositRequired.message}
-                      </p>
-                    )}
-                  </div>
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Room Type</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {ROOM_TYPES.map((type) => {
-                      const roomTypeValue = form.watch("roomType") || [];
-                      return (
-                        <div key={type} className="flex items-center space-x-2 space-y-0">
-                          <Checkbox
-                            id={`roomType-${type}`}
-                            checked={roomTypeValue.includes(type)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues("roomType") || [];
-                              if (checked) {
-                                form.setValue("roomType", [...current, type]);
-                              } else {
-                                form.setValue("roomType", current.filter((val) => val !== type));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`roomType-${type}`} className="font-normal cursor-pointer">
-                            {type}
-                          </Label>
-                        </div>
-                      );
+                  <Label htmlFor="deposit">Deposit (RM) - Optional</Label>
+                  <Input
+                    id="deposit"
+                    type="number"
+                    placeholder="1800"
+                    {...form.register("deposit", {
+                      setValueAs: (v) => v === "" ? null : Number(v)
                     })}
-                  </div>
-                  {form.formState.errors.roomType && (
+                  />
+                  {form.formState.errors.deposit && (
                     <p className="text-destructive text-sm">
-                      {form.formState.errors.roomType.message}
+                      {form.formState.errors.deposit.message}
                     </p>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Bills & Utilities</CardTitle>
-                <CardDescription>
-                  Which bills are included in the rent?
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {(["wifi", "electricity", "water", "gas"] as const).map((bill) => {
-                    const billValue = form.watch(`billsIncluded.${bill}`);
+              <div className="grid gap-2">
+                <Label>Room Type</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {ROOM_TYPES.map((type) => {
+                    const roomTypeValue = form.watch("roomType") || [];
                     return (
-                      <div key={bill} className="flex items-center space-x-2 space-y-0">
+                      <div key={type} className="flex items-center space-x-2 space-y-0">
                         <Checkbox
-                          id={`bill-${bill}`}
-                          checked={billValue ?? false}
+                          id={`roomType-${type}`}
+                          checked={roomTypeValue.includes(type)}
                           onCheckedChange={(checked) => {
-                            form.setValue(`billsIncluded.${bill}`, checked as boolean);
+                            const current = form.getValues("roomType") || [];
+                            if (checked) {
+                              form.setValue("roomType", [...current, type]);
+                            } else {
+                              form.setValue("roomType", current.filter((val) => val !== type));
+                            }
                           }}
                         />
-                        <Label htmlFor={`bill-${bill}`} className="capitalize font-normal cursor-pointer">
-                          {bill}
+                        <Label htmlFor={`roomType-${type}`} className="font-normal cursor-pointer">
+                          {type}
                         </Label>
                       </div>
                     );
                   })}
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Tenant Preferences</CardTitle>
-                <CardDescription>
-                  Specify your tenant preferences (optional)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-2">
-                  <Label>Preferred Race</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {races.map((race) => {
-                      const racesValue = form.watch("preferredRaces") || [];
-                      return (
-                        <div key={race} className="flex items-center space-x-2 space-y-0">
-                          <Checkbox
-                            id={`race-${race}`}
-                            checked={racesValue.includes(race)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues("preferredRaces") || [];
-                              if (checked) {
-                                form.setValue("preferredRaces", [...current, race]);
-                              } else {
-                                form.setValue("preferredRaces", current.filter((val) => val !== race));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`race-${race}`} className="font-normal cursor-pointer">
-                            {race}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {form.formState.errors.preferredRaces && (
-                    <p className="text-destructive text-sm">
-                      {form.formState.errors.preferredRaces.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid gap-2">
-                  <Label>Preferred Occupation</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {occupations.map((occupation) => {
-                      const occupationsValue = form.watch("preferredOccupation") || [];
-                      return (
-                        <div key={occupation} className="flex items-center space-x-2 space-y-0">
-                          <Checkbox
-                            id={`occupation-${occupation}`}
-                            checked={occupationsValue.includes(occupation)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues("preferredOccupation") || [];
-                              if (checked) {
-                                form.setValue("preferredOccupation", [...current, occupation]);
-                              } else {
-                                form.setValue("preferredOccupation", current.filter((val) => val !== occupation));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`occupation-${occupation}`} className="font-normal cursor-pointer">
-                            {occupation}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {form.formState.errors.preferredOccupation && (
-                    <p className="text-destructive text-sm">
-                      {form.formState.errors.preferredOccupation.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid gap-2">
-                  <Label>Lease Term</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {leaseTerms.map((term) => {
-                      const leaseTermsValue = form.watch("leaseTermCategory") || [];
-                      return (
-                        <div key={term} className="flex items-center space-x-2 space-y-0">
-                          <Checkbox
-                            id={`leaseTerm-${term}`}
-                            checked={leaseTermsValue.includes(term)}
-                            onCheckedChange={(checked) => {
-                              const current = form.getValues("leaseTermCategory") || [];
-                              if (checked) {
-                                form.setValue("leaseTermCategory", [...current, term]);
-                              } else {
-                                form.setValue("leaseTermCategory", current.filter((val) => val !== term));
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`leaseTerm-${term}`} className="font-normal cursor-pointer">
-                            {term}
-                          </Label>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {form.formState.errors.leaseTermCategory && (
-                    <p className="text-destructive text-sm">
-                      {form.formState.errors.leaseTermCategory.message}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Location Information</CardTitle>
-                <CardDescription>
-                  Where is your property located?
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="grid gap-2">
-                    <Label htmlFor="state">State</Label>
-                    <Select
-                      value={form.watch("state")}
-                      onValueChange={(value) => form.setValue("state", value)}
-                    >
-                      <SelectTrigger id="state">
-                        <SelectValue placeholder="Select state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MALAYSIAN_STATES.map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {form.formState.errors.state && (
-                      <p className="text-destructive text-sm">
-                        {form.formState.errors.state.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input 
-                      id="city"
-                      placeholder="e.g., Petaling Jaya" 
-                      {...form.register("city")} 
-                    />
-                    {form.formState.errors.city && (
-                      <p className="text-destructive text-sm">
-                        {form.formState.errors.city.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="grid gap-2">
-                  <Label htmlFor="address">Full Address</Label>
-                  <Textarea
-                    id="address"
-                    placeholder="Include street name, building, and unit number"
-                    className="resize-none"
-                    {...form.register("address")}
-                  />
-                  {form.formState.errors.address && (
-                    <p className="text-destructive text-sm">
-                      {form.formState.errors.address.message}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-2xl">Property Images</CardTitle>
-                <CardDescription>
-                  Upload clear and attractive images of your property
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer ${
-                    isDragging
-                      ? "border-primary bg-primary/10"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <input
-                    type="file"
-                    id="file-upload"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e.target.files)}
-                    className="hidden"
-                  />
-
-                  <label htmlFor="file-upload">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="p-4 bg-primary/10 rounded-full">
-                        <Upload className="w-8 h-8 text-primary" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-lg font-medium">
-                          Drag & drop images here, or click to upload
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Supported: JPG, PNG, WEBP (Max 5MB)
-                        </p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-
-                {imagePreviews.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4"
-                  >
-                    {imagePreviews.map((preview, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: index * 0.06 }}
-                        className="relative group aspect-square"
-                      >
-                        <img
-                          src={preview}
-                          alt={`Property preview ${index + 1}`}
-                          className="w-full h-full object-cover rounded-xl border shadow-sm"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </motion.div>
+                {form.formState.errors.roomType && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.roomType.message}
+                  </p>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full h-14 text-lg font-semibold shadow-md hover:shadow-lg transition-all"
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Bills & Utilities</CardTitle>
+              <CardDescription>
+                Which bills are included in the rent?
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {(["wifi", "electricity", "water", "gas"] as const).map((bill) => {
+                  const billValue = form.watch(`billsIncluded.${bill}`);
+                  return (
+                    <div key={bill} className="flex items-center space-x-2 space-y-0">
+                      <Checkbox
+                        id={`bill-${bill}`}
+                        checked={billValue ?? false}
+                        onCheckedChange={(checked) => {
+                          form.setValue(`billsIncluded.${bill}`, checked as boolean);
+                        }}
+                      />
+                      <Label htmlFor={`bill-${bill}`} className="capitalize font-normal cursor-pointer">
+                        {bill}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Tenant Preferences</CardTitle>
+              <CardDescription>
+                Specify your tenant preferences (optional)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-2">
+                <Label>Preferred Race</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {races.map((race) => {
+                    const racesValue = form.watch("preferredRaces") || [];
+                    return (
+                      <div key={race} className="flex items-center space-x-2 space-y-0">
+                        <Checkbox
+                          id={`race-${race}`}
+                          checked={racesValue.includes(race)}
+                          onCheckedChange={(checked) => {
+                            const current = form.getValues("preferredRaces") || [];
+                            if (checked) {
+                              form.setValue("preferredRaces", [...current, race]);
+                            } else {
+                              form.setValue("preferredRaces", current.filter((val) => val !== race));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`race-${race}`} className="font-normal cursor-pointer">
+                          {race}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+                {form.formState.errors.preferredRaces && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.preferredRaces.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Preferred Occupation</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {occupations.map((occupation) => {
+                    const occupationsValue = form.watch("preferredOccupation") || [];
+                    return (
+                      <div key={occupation} className="flex items-center space-x-2 space-y-0">
+                        <Checkbox
+                          id={`occupation-${occupation}`}
+                          checked={occupationsValue.includes(occupation)}
+                          onCheckedChange={(checked) => {
+                            const current = form.getValues("preferredOccupation") || [];
+                            if (checked) {
+                              form.setValue("preferredOccupation", [...current, occupation]);
+                            } else {
+                              form.setValue("preferredOccupation", current.filter((val) => val !== occupation));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`occupation-${occupation}`} className="font-normal cursor-pointer">
+                          {occupation}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+                {form.formState.errors.preferredOccupation && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.preferredOccupation.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label>Lease Term</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {leaseTerms.map((term) => {
+                    const leaseTermsValue = form.watch("leaseTermCategory") || [];
+                    return (
+                      <div key={term} className="flex items-center space-x-2 space-y-0">
+                        <Checkbox
+                          id={`leaseTerm-${term}`}
+                          checked={leaseTermsValue.includes(term)}
+                          onCheckedChange={(checked) => {
+                            const current = form.getValues("leaseTermCategory") || [];
+                            if (checked) {
+                              form.setValue("leaseTermCategory", [...current, term]);
+                            } else {
+                              form.setValue("leaseTermCategory", current.filter((val) => val !== term));
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`leaseTerm-${term}`} className="font-normal cursor-pointer">
+                          {term}
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </div>
+                {form.formState.errors.leaseTermCategory && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.leaseTermCategory.message}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Location Information</CardTitle>
+              <CardDescription>
+                Where is your property located?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid gap-2">
+                  <Label htmlFor="state">State</Label>
+                  <Select
+                    value={form.watch("state")}
+                    onValueChange={(value) => form.setValue("state", value)}
+                  >
+                    <SelectTrigger id="state">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MALAYSIAN_STATES.map((state) => (
+                        <SelectItem key={state} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.state && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.state.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    placeholder="e.g., Petaling Jaya"
+                    {...form.register("city")}
+                  />
+                  {form.formState.errors.city && (
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.city.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid gap-2">
+                <Label htmlFor="address">Full Address</Label>
+                <Textarea
+                  id="address"
+                  placeholder="Include street name, building, and unit number"
+                  className="resize-none"
+                  {...form.register("address")}
+                />
+                {form.formState.errors.address && (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors.address.message}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Property Images</CardTitle>
+              <CardDescription>
+                Upload clear and attractive images of your property
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-xl p-10 text-center transition-all cursor-pointer ${isDragging
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary/50"
+                  }`}
               >
-                Publish Listing
-              </Button>
-            </motion.div>
-          </form>
+                <input
+                  type="file"
+                  id="file-upload"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e.target.files)}
+                  className="hidden"
+                />
+
+                <label htmlFor="file-upload">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="p-4 bg-primary/10 rounded-full">
+                      <Upload className="w-8 h-8 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-lg font-medium">
+                        Drag & drop images here, or click to upload
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Supported: JPG, PNG, WEBP (Max 5MB)
+                      </p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {imagePreviews.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                >
+                  {imagePreviews.map((preview, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: index * 0.06 }}
+                      className="relative group aspect-square"
+                    >
+                      <img
+                        src={preview}
+                        alt={`Property preview ${index + 1}`}
+                        className="w-full h-full object-cover rounded-xl border shadow-sm"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </CardContent>
+          </Card>
+
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full h-14 text-lg font-semibold shadow-md hover:shadow-lg transition-all"
+            >
+              Publish Listing
+            </Button>
+          </motion.div>
+        </form>
       </motion.div>
     </div>
   );

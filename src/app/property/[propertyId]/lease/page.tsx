@@ -8,7 +8,7 @@ export default async function CreateLeasePage({ params }: CreateLeasePage) {
   const { propertyId } = await params;
   return (
     <div className="min-h-[calc(100dvh-4rem)] container mx-auto my-4">
-      <DocumentBuilder propertyId={propertyId} />
+      <DocumentBuilder propertyId={propertyId} mode="create" />
     </div>
   );
 }

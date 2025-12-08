@@ -5,8 +5,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
-import { devLog } from "@/lib/utils";
-import axios from "axios";
+import { cn, devLog, logApiErr } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const fetchBuilderToken = withAuth(
   async (propertyId?: string, templateId?: string) => {
@@ -21,50 +21,73 @@ const fetchBuilderToken = withAuth(
   },
 );
 
-const handleSaveChanges = withAuth(async (data: unknown, propertyId?: string, templateId?: string) => {
-  devLog("Data:", data);
-  if (!propertyId || !templateId) {
-    throw new Error(`Missing params: propertyId=${propertyId}, templateId=${templateId}`);
-  }
+const handleSaveChanges = withAuth(async (data: unknown, propertyId: string, templateId?: string) => {
+  devLog("Save Data:", data);
+  if (!templateId) throw new Error(`Param missing: templateId=${templateId}`)
   const response = await api.post(`/api/docuseal/save-lease?propertyId=${propertyId}&templateId=${templateId}`, data);
-  return response.data
+  return response.data;
 });
+
+const handleCreateLease = withAuth(async (data: unknown, propertyId: string) => {
+  devLog("Create Data:", data);
+  const response = await api.post(`/api/docuseal/create-lease?propertyId=${propertyId}`, data);
+  return response.data;
+})
 
 interface DocumentBuilderProps {
   propertyId: string;
   templateId?: string;
+  mode: "create" | "edit";
 }
 
 export default function DocumentBuilder({
   propertyId,
   templateId,
+  mode,
 }: DocumentBuilderProps) {
+  const router = useRouter();
+
+  const { mutate: createMutation } = useMutation({
+    mutationFn: (data) => handleCreateLease(data, propertyId),
+    onSuccess: (response) => {
+      devLog("Agreement Created!");
+      router.push(`/property/${propertyId}/lease/${response.templateId}`);
+    },
+    onError: (err) => {
+      logApiErr(err);
+    }
+  });
+
+  const { mutate: saveMutation } = useMutation({
+    mutationFn: (data) => handleSaveChanges(data, propertyId, templateId!),
+    onSuccess: () => {
+      devLog("Agreement Saved")
+    },
+    onError: (err) => {
+      logApiErr(err);
+    }
+  });
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["builder-token", propertyId, templateId],
     queryFn: () => fetchBuilderToken(propertyId, templateId),
   });
 
-  const { mutate: handleSave } = useMutation({
-    mutationFn: (data) => handleSaveChanges(data, propertyId, templateId),
-    onError: (error) => {
-      if (axios.isAxiosError(error)) console.error(error.response?.data);
-      else console.error(error);
-    },
-    onSuccess: () => {
-      console.log("Agreement updated successfully!")
-    }
-  })
-
   return (
-    <div>
+    <div className="px-2">
       <div className="h-[calc(100dvh-4rem)] overflow-y-scroll bg-slate-200">
-        {isLoading && <LoadingSpinner text="Loading Document..." />}
+        {isLoading && <LoadingSpinner text="Loading..." />}
+        {!templateId && <LoadingSpinner text="Creating Template..." />}
         {isError && <div className="text-red-500">{error.message}</div>}
-        {data && <DocusealBuilder
-          token={data.token.result}
-          onSave={(data) => handleSave(data)}
-        />}
-
+        {data && (
+          <div className={cn("w-full h-full", !templateId && "hidden")}>
+            <DocusealBuilder
+              token={data.token.result}
+              onSave={(data) => mode === "edit" ? saveMutation(data) : createMutation(data)}
+              onLoad={(data) => mode === "create" ? createMutation(data) : undefined}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
