@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { Plus, Edit, MapPin, DollarSign, Home, Calendar } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Edit, MapPin, DollarSign, Home, Calendar, Trash2 } from "lucide-react";
 import Link from "next/link";
 import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserPropertyOptions } from "@/queries/get-current-user-property-query";
@@ -9,6 +9,7 @@ import { Property } from "@/types/property";
 import { devOut } from "@/lib/utils";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
+import { useToast } from "@/providers/toast-provider";
 
 interface PropertyApplication {
   id: string;
@@ -23,6 +24,8 @@ interface PropertyApplication {
 
 function PropertyRow({ property }: { property: Property }) {
   const primaryImage = property.images?.[0] || "/placeholder-property.jpg";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch applications for the property
     const {
@@ -37,6 +40,32 @@ function PropertyRow({ property }: { property: Property }) {
       }),
       enabled: !!property.id,
     });
+
+  // Delete property mutation
+  const deletePropertyMutation = useMutation({
+    mutationFn: withAuth(async (propertyId: string) => {
+      await api.delete(`/api/Property/${propertyId}`);
+    }),
+    onSuccess: () => {
+      toast({
+        title: "Property deleted",
+        message: "Your property has been successfully deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["current-user-property"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        message: error?.message || "Failed to delete property.",
+      });
+    },
+  });
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${property.title}"? This action cannot be undone.`)) {
+      deletePropertyMutation.mutate(property.id);
+    }
+  };
 
   return (
     <div className="border rounded-lg p-4 hover:bg-accent/5 transition">
@@ -112,6 +141,15 @@ function PropertyRow({ property }: { property: Property }) {
               <Link href={`/property/${property.id}/applicants`}>
                 Applicants {applications.length > 0 && `(${applications.length})`}
               </Link>
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={handleDelete}
+              disabled={deletePropertyMutation.isPending}
+            >
+              <Trash2 className="w-3 h-3 mr-1" />
+              Delete
             </Button>
           </div>
         </div>
