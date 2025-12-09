@@ -34,12 +34,14 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
               <div className="text-gray-500 text-sm">No submissions yet.</div>
             ) : (
               <div className="space-y-2">
+                {/*
                 {submissions.map((sub) => (
                   <div key={sub.id} className="flex justify-between p-2 bg-slate-50 rounded">
                     <span>{sub.email}</span>
                     <span className="text-blue-600">{sub.status}</span>
                   </div>
                 ))}
+              */}
               </div>
             )}
           </div>
