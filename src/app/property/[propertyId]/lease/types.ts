@@ -12,4 +12,5 @@ export interface CreateTemplateResponse {
   message: string,
   created: boolean;
   templateId: string;
+  signerEmail: string;
 }

@@ -334,7 +334,7 @@ function ApplicantCard({
 
               <div className="mt-4 flex gap-2">
                 <Button className="flex-1" asChild>
-                  <Link href={`/property/${application.propertyId}/lease`}>
+                  <Link href={`/property/${application.propertyId}/lease?signerEmail=${application.applicantEmail}`}>
                     Send Application
                   </Link>
                 </Button>

@@ -7,6 +7,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -17,6 +18,7 @@
     opacity: 0;
     transform: translateY(20%);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -28,6 +30,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-20%);
@@ -49,7 +52,7 @@
   --muted-foreground: oklch(0.592 0.1044 235.2363);
   --accent: oklch(0.671 0.0965 197.4147);
   --accent-foreground: oklch(0.9997 0.0013 106.4229);
-  --destructive: oklch(61.294% 0.25154 29.223);
+  --destructive: oklch(0.61294 0.18154 29.223);
   --destructive-foreground: oklch(0.9997 0.0013 106.4229);
   --border: oklch(0.8201 0.0164 216.696);
   --input: oklch(0.7871 0.0865 197.4147);
@@ -210,6 +213,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

@@ -1,5 +1,6 @@
 import DisplayError from "@/app/_components/display-error";
 import DocumentSigner from "../_components/document-signer";
+import { Suspense } from "react";
 
 interface LeaseSubmissionPageProps {
   params: Promise<{ slug: string }>;
@@ -10,8 +11,10 @@ export default async function LeaseSubmissionPage({ params }: LeaseSubmissionPag
   return (
     <main className="min-h-screen container mx-auto">
       {slug ? (
-        <div className="mt-8">
-          <DocumentSigner slug={slug} />
+        <div className="my-8">
+          <Suspense>
+            <DocumentSigner slug={slug} />
+          </Suspense>
         </div>
       ) : (
         <div className="w-full mt-32 flex items-center justify-center">

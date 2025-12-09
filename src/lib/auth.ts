@@ -1,6 +1,7 @@
 import { TokenPayload } from "@/types/token";
 import { jwtDecode } from "jwt-decode";
 import api from "./api";
+import axios from "axios";
 
 export function decodeToken(token: string): TokenPayload | null {
   try {
@@ -12,11 +13,19 @@ export function decodeToken(token: string): TokenPayload | null {
 
 export const refreshAccessToken = async (): Promise<string> => {
   console.log("Calling refresh endpoint...");
-  const response = await api.post("/api/auth/refresh");
-  // console.log("Refresh response:", response.data);
-  const newAccessToken = response.data.accessToken;
-  localStorage.setItem("accessToken", newAccessToken);
-  return newAccessToken;
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refresh`,
+      {},
+      { withCredentials: true },
+    );
+    const newAccessToken = response.data.accessToken;
+    localStorage.setItem("accessToken", newAccessToken);
+    return newAccessToken;
+  } catch (error) {
+    console.error("Refresh token failed:", error);
+    throw error;
+  }
 };
 
 export const withAuth = <T extends unknown[], R>(
@@ -32,7 +41,7 @@ export const withAuth = <T extends unknown[], R>(
     // Token exists and not expired
     if (token) {
       const decoded = decodeToken(token);
-      console.log(decoded);
+      // console.log(decoded);
       if (decoded) {
         const now = Math.floor(Date.now() / 1000);
         const expTimestamp =
@@ -49,11 +58,13 @@ export const withAuth = <T extends unknown[], R>(
 
     try {
       token = await refreshAccessToken();
-      return await func(...args);
     } catch {
       localStorage.removeItem("accessToken");
+      window.location.href = "/auth/login";
       throw new Error("Session expired. Please login again");
     }
+
+    return await func(...args);
   };
 };
 
