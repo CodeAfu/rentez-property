@@ -8,7 +8,7 @@ import api from "@/lib/api";
 import { cn, devLog, jsonLog, logApiErr } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SaveTemplateResponse } from "../types";
+import { CreateTemplateResponse, SaveTemplateResponse } from "../types";
 
 const fetchBuilderToken = withAuth(
   async (propertyId?: string, templateId?: string) => {
@@ -36,6 +36,12 @@ const handleCreateLease = withAuth(async (data: unknown, propertyId: string) => 
   return response.data;
 })
 
+const handleSendEmail = withAuth(async (data: unknown, propertyId: string) => {
+  jsonLog("Send email payload:", data);
+  const response = await api.post(`/api/docuseal/send-lease?propertyId=${propertyId}`, data);
+  return response.data
+});
+
 interface DocumentBuilderProps {
   propertyId: string;
   templateId?: string;
@@ -53,8 +59,8 @@ export default function DocumentBuilder({
 
   const { mutate: createMutation, isError: isCreateError, error: createError } = useMutation({
     mutationFn: (data) => handleCreateLease(data, propertyId),
-    onSuccess: (response) => {
-      devLog("Agreement Created!");
+    onSuccess: (response: CreateTemplateResponse) => {
+      devLog(response.message);
       router.push(`/property/${propertyId}/lease/${response.templateId}`);
     },
     onError: (err) => {
@@ -74,6 +80,16 @@ export default function DocumentBuilder({
     }
   });
 
+  const { mutate: sendEmailMutation, isError: isSendEmailError, error: sendEmailError } = useMutation({
+    mutationFn: (data) => handleSendEmail(data, propertyId),
+    onSuccess: (response) => {
+      devLog(response);
+    },
+    onError: (err) => {
+      logApiErr(err)
+    },
+  })
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["builder-token", propertyId, templateId],
     queryFn: () => fetchBuilderToken(propertyId, templateId),
@@ -87,17 +103,20 @@ export default function DocumentBuilder({
         {isError && <div className="text-red-500">{error.message}</div>}
         {isCreateError && <div className="text-red-500">{createError.message}</div>}
         {isSaveError && <div className="text-red-500">{saveError.message}</div>}
+        {isSendEmailError && <div className="text-red-500">{sendEmailError.message}</div>}
         {data && (
           <div className={cn("w-full h-full", !templateId && "hidden")}>
             <DocusealBuilder
               token={data.token.result}
+              withSendButton={mode === "edit"}
+              withSignYourselfButton={mode === "edit"}
               emailMessage={{
-                subject: "You are invited to sign a document",
+                subject: "RentEZ Property: Lease Agreement Signing Invitation",
                 body: `Hi there,
 
-You have been invited to sign the "${docName}".
+You have been invited to sign the document "${docName}".
 
-[Review and Sign](${window.location.origin}/)
+[Review and Sign](${window.location.origin}/lease-submission/${slug})
 
 Please contact us by replying to this email if you have any questions.
 

@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import Link from "next/link";
 
 interface PropertyApplication {
   id: string;
@@ -273,7 +274,7 @@ function ApplicantCard({
                         <p className="text-xs text-muted-foreground">Date of Birth</p>
                         <p className="font-medium">
                           {userDetails.dateOfBirth &&
-                          userDetails.dateOfBirth !== "0001-01-01T00:00:00"
+                            userDetails.dateOfBirth !== "0001-01-01T00:00:00"
                             ? formatDate(userDetails.dateOfBirth)
                             : "Not provided"}
                         </p>
@@ -333,9 +334,9 @@ function ApplicantCard({
 
               <div className="mt-4 flex gap-2">
                 <Button className="flex-1" asChild>
-                  <a href={`mailto:${application.applicantEmail}`}>
-                    Contact Applicant
-                  </a>
+                  <Link href={`/property/${application.propertyId}/lease`}>
+                    Send Application
+                  </Link>
                 </Button>
               </div>
             </motion.div>

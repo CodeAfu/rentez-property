@@ -7,3 +7,9 @@ export interface SaveTemplateResponse {
     slug: string;
   }
 }
+
+export interface CreateTemplateResponse {
+  message: string,
+  created: boolean;
+  templateId: string;
+}
