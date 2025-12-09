@@ -5,8 +5,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
-import { cn, devLog, logApiErr } from "@/lib/utils";
+import { cn, devLog, jsonLog, logApiErr } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { SaveTemplateResponse } from "../types";
 
 const fetchBuilderToken = withAuth(
   async (propertyId?: string, templateId?: string) => {
@@ -45,7 +47,10 @@ export default function DocumentBuilder({
   templateId,
   mode,
 }: DocumentBuilderProps) {
+  const [docName, setDocName] = useState("");
+  const [slug, setSlug] = useState("")
   const router = useRouter();
+
   const { mutate: createMutation, isError: isCreateError, error: createError } = useMutation({
     mutationFn: (data) => handleCreateLease(data, propertyId),
     onSuccess: (response) => {
@@ -59,8 +64,10 @@ export default function DocumentBuilder({
 
   const { mutate: saveMutation, isError: isSaveError, error: saveError } = useMutation({
     mutationFn: (data) => handleSaveChanges(data, propertyId, templateId!),
-    onSuccess: () => {
-      devLog("Agreement Saved")
+    onSuccess: (response: SaveTemplateResponse) => {
+      devLog(response.message, response.data);
+      setSlug(response.data.slug);
+      setDocName(response.data.name);
     },
     onError: (err) => {
       logApiErr(err);
@@ -84,10 +91,22 @@ export default function DocumentBuilder({
           <div className={cn("w-full h-full", !templateId && "hidden")}>
             <DocusealBuilder
               token={data.token.result}
-              withSendButton={false}
-              withSignYourselfButton={false}
+              emailMessage={{
+                subject: "You are invited to sign a document",
+                body: `Hi there,
+
+You have been invited to sign the "${docName}".
+
+[Review and Sign](${window.location.origin}/)
+
+Please contact us by replying to this email if you have any questions.
+
+Thanks,
+RentEZ Admin`,
+              }}
               onSave={(data) => mode === "edit" ? saveMutation(data) : createMutation(data)}
-              onLoad={(data) => mode === "create" ? createMutation(data) : undefined}
+              onLoad={(data) => mode === "create" ? createMutation(data) : saveMutation(data)}
+              onSend={(data) => jsonLog("SEND DATA", data)}
             />
           </div>
         )}

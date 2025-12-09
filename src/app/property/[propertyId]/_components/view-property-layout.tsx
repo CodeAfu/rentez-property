@@ -54,7 +54,6 @@ export default function ViewPropertyLayout({
         const responseData = error.response?.data;
         console.log("API Error Response Data:", responseData);
 
-        // Check if profile is incomplete and needs redirect
         if (responseData?.profileIncomplete && responseData?.redirectTo) {
           router.push(responseData.redirectTo);
           toast({
@@ -86,7 +85,7 @@ export default function ViewPropertyLayout({
 
   return (
     <div className="container mx-auto px-4">
-      {/* 1. Header & Location */}
+      {/* Header & Location */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {property.title}
@@ -99,11 +98,11 @@ export default function ViewPropertyLayout({
         </div>
       </div>
 
-      {/* 2. Image Carousel */}
+      {/* Image Carousel */}
       <PropertyImageCarousel images={property.images} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* 3. Main Content (Left) */}
+        {/* Main Content (Left) */}
         <div className="lg:col-span-2 space-y-8">
           {/* Quick Stats */}
           <div className="flex flex-wrap gap-3">
@@ -177,7 +176,7 @@ export default function ViewPropertyLayout({
           </div>
         </div>
 
-        {/* 4. Sidebar (Right) - Sticky */}
+        {/* Sidebar (Right) - Sticky */}
         <div className="relative">
           <div className="sticky top-24 border rounded-xl p-6 shadow-sm bg-card">
             <div className="mb-6">

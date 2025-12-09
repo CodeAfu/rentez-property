@@ -1,6 +1,7 @@
 "use client";
 
 import LoadingSpinner from "@/components/loading-spinner";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 
 interface SubmissionsListProps {
@@ -18,13 +19,15 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
     <div className="px-2">
       <div className="bg-card shadow p-4 max-w-6xl w-full h-fit">
         {isLoading ? <LoadingSpinner /> : (
-          <div className="text-sm">
-            <h1 className="text-xl font-semibold pb-2 mb-4 border-b border-b-border/50">Submissions</h1>
-            {data ? (
-              <div>Data</div>
-            ) : (
-              <div>You do not have any submissions yet.</div>
-            )}
+          <div className="flex flex-col">
+            <div className="text-sm">
+              <h1 className="text-xl font-semibold pb-2 mb-4 border-b border-b-border/50">Submissions</h1>
+              {data ? (
+                <div>Data</div>
+              ) : (
+                <div>You do not have any submissions yet.</div>
+              )}
+            </div>
           </div>
         )}
       </div>
