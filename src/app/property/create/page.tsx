@@ -32,7 +32,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { useRouter, usePathname } from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
 import api from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { withAuth } from "@/lib/auth";
 
@@ -74,6 +74,7 @@ const occupations = ["Student", "Working Professional", "Any"];
 const leaseTerms = ["Short Term", "Long Term", "Flexible"];
 
 export default function CreateListing() {
+  const queryClient = useQueryClient();
   const [, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -223,6 +224,7 @@ export default function CreateListing() {
 
     // need to add deposit field in the backend only true or false field is there.
     createPropertyMutation.mutate(payload);
+    queryClient.invalidateQueries({ queryKey: ["property"] });
   };
 
   if (isAuthenticating) return <LoadingSpinner />;

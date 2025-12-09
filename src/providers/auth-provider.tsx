@@ -121,8 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { accessToken } = data.data;
       localStorage.setItem("accessToken", accessToken);
       setIsAuthenticated(true);
-      const params = new URLSearchParams(window.location.search);
-      router.push(params.get("redirectTo") ?? "/");
+      // const params = new URLSearchParams(window.location.search);
+      // router.push(params.get("redirectTo") ?? "/");
+      router.back();
     },
     onError: (err) => {
       if (axios.isAxiosError(err)) {

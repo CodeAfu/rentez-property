@@ -66,7 +66,7 @@ export function PropertyImageCarousel({ images }: PropertyImageCarouselProps) {
       {count > 1 && (
         <>
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity rounded-full h-10 w-10 shadow-lg"
             onClick={scrollPrev}
@@ -75,7 +75,7 @@ export function PropertyImageCarousel({ images }: PropertyImageCarouselProps) {
           </Button>
 
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity rounded-full h-10 w-10 shadow-lg"
             onClick={scrollNext}

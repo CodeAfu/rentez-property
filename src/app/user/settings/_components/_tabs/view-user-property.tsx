@@ -6,7 +6,6 @@ import Link from "next/link";
 import LoadingSpinner from "@/components/loading-spinner";
 import { getCurrentUserPropertyOptions } from "@/queries/get-current-user-property-query";
 import { Property } from "@/types/property";
-import { devOut } from "@/lib/utils";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
 import { useToast } from "@/providers/toast-provider";
@@ -51,7 +50,7 @@ function PropertyRow({ property }: { property: Property }) {
         title: "Property deleted",
         message: "Your property has been successfully deleted.",
       });
-      queryClient.invalidateQueries({ queryKey: ["current-user-property"] });
+      queryClient.invalidateQueries({ queryKey: ["property"] });
     },
     onError: (error) => {
       toast({
@@ -68,7 +67,7 @@ function PropertyRow({ property }: { property: Property }) {
   };
 
   return (
-    <div className="border rounded-lg p-4 hover:bg-accent/5 transition">
+    <div className="border rounded-lg p-4 hover:bg-accent/5 transition-scroll">
       <div className="flex gap-4">
         <div className="flex items-center">
           <div className="w-32 h-24 shrink-0 flex items-center rounded overflow-hidden hover:scale-105 transition duration-200">
@@ -214,9 +213,6 @@ export default function ViewUserProperty() {
           ))}
         </div>
       )}
-      <p className="text-xs font-light text-gray-900 pt-4 max-w-full wrap-break-words">
-        {devOut(JSON.stringify(propertyData.data, null, 2))}
-      </p>
     </section>
   );
 }
