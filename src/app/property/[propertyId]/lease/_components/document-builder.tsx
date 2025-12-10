@@ -132,7 +132,7 @@ export default function DocumentBuilder({
           {signerEmail && (
             <Button
               onClick={() => createSubmissionMutation()}
-              disabled={!templateId || isSending}
+              disabled={!templateId || !propertyId || isSending}
               variant={isSendError ? "destructive" : "default"}
             >
               {isSending ? (

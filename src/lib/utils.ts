@@ -15,7 +15,7 @@ export function jsonLog(arg1: unknown, arg2?: unknown): void {
   if (arg2 === undefined) {
     console.log(`[${JSON.stringify(arg1, null, 2)}]`);
   } else {
-    console.log(`${arg1}\n(${JSON.stringify(arg2, null, 2)})`);
+    console.log(`${arg1}\n[${JSON.stringify(arg2, null, 2)}]`);
   }
 }
 
