@@ -70,7 +70,7 @@ export default function SearchClient() {
 
   // 5. Query
   const { data, isLoading, isPlaceholderData } = useQuery<PaginatedProperty>({
-    queryKey: ["properties", parsedQuery],
+    queryKey: ["property", parsedQuery],
     queryFn: () => getProperties(parsedQuery),
     placeholderData: (prev) => prev,
   });

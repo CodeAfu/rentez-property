@@ -100,10 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSuccess: async (data) => {
-      queryClient.invalidateQueries({ queryKey: ["property"] })
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["property-applications"] });
-      queryClient.invalidateQueries({ queryKey: ["user-details"] });
       localStorage.removeItem("accessToken");
       setIsAuthenticated(false);
       console.log(data);
