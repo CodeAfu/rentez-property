@@ -1,6 +1,5 @@
 import { TokenPayload } from "@/types/token";
 import { jwtDecode } from "jwt-decode";
-import api from "./api";
 import axios from "axios";
 
 export function decodeToken(token: string): TokenPayload | null {

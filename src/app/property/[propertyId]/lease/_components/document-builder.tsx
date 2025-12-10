@@ -1,7 +1,7 @@
 "use client";
 
 import { DocusealBuilder } from "@docuseal/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "@/components/loading-spinner";
 import { withAuth } from "@/lib/auth";
 import api from "@/lib/api";
@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 
 interface CreateSubmissionPayload {
   propertyId: string;
-  templateId: string;
   tenantEmail: string;
   role?: string;
   sendEmail?: boolean;
@@ -71,6 +70,7 @@ export default function DocumentBuilder({
   templateId,
   mode,
 }: DocumentBuilderProps) {
+  const queryClient = useQueryClient()
   const router = useRouter();
   const searchParams = useSearchParams();
   const signerEmail = searchParams.get("signerEmail");
@@ -98,18 +98,13 @@ export default function DocumentBuilder({
 
   const { mutate: createSubmissionMutation, isPending: isSending, isError: isSendError, error: sendError } = useMutation({
     mutationFn: async () => {
-      // 1. Validation: Ensure we have the necessary data before calling backend
       if (!templateId) throw new Error("Template ID is missing. Please save the document first.");
       if (!data?.signerEmail) throw new Error("Signer Email is missing.");
 
-      // 2. Construct Payload
       const payload: CreateSubmissionPayload = {
         propertyId,
-        templateId,
         tenantEmail: data.signerEmail,
         role: "Tenant",
-        // Set to false if you are sending the email yourself via your .NET EmailService
-        // Set to true if you want DocuSeal to send their default email
         sendEmail: false
       };
 
@@ -117,8 +112,7 @@ export default function DocumentBuilder({
     },
     onSuccess: (response) => {
       devLog("Submission Successful", response);
-      // Optional: Redirect or show success toast
-      // queryClient.invalidateQueries(["submissions", propertyId]);
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
     },
     onError: (err) => {
       logApiErr(err);

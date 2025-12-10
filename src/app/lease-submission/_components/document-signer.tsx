@@ -50,6 +50,7 @@ export default function DocumentSigner({ slug }: DocumentViewProps) {
       >
         {data && (
           <DocusealForm
+            src={`https://docuseal.com/d/${slug}`}
             token={data.token}
           />
         )}

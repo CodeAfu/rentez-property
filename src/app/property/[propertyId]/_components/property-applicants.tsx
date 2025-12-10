@@ -25,6 +25,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import Link from "next/link";
+import { jsonLog } from "@/lib/utils";
 
 interface PropertyApplication {
   id: string;
