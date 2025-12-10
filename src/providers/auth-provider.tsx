@@ -123,8 +123,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { accessToken } = data.data;
       localStorage.setItem("accessToken", accessToken);
       setIsAuthenticated(true);
-      // const params = new URLSearchParams(window.location.search);
-      // router.push(params.get("redirectTo") ?? "/");
+      queryClient.invalidateQueries({ queryKey: ["property"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["propertyapplications"] });
       router.back();
     },
     onError: (err) => {
