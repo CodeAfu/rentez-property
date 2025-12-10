@@ -7,8 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { LoginFormData, loginSchema } from "@/types/user";
 import { useAuth } from "@/providers/auth-provider";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LoginForm() {
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -22,6 +24,7 @@ export default function LoginForm() {
 
   const onSubmit = (data: LoginFormData) => {
     login(data);
+    queryClient.invalidateQueries({ queryKey: ["property", "u"] })
   };
 
   const getErrorMessage = () => {

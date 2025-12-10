@@ -13,9 +13,9 @@ export function devLog(...args: unknown[]): void {
 export function jsonLog(arg1: unknown, arg2?: unknown): void {
   if (process.env.NODE_ENV !== "development") return;
   if (arg2 === undefined) {
-    console.log(`(${JSON.stringify(arg1, null, 2)})`);
+    console.log(`[${JSON.stringify(arg1, null, 2)}]`);
   } else {
-    console.log(`${arg1}\n(${JSON.stringify(arg2, null, 2)})`);
+    console.log(`${arg1}\n[${JSON.stringify(arg2, null, 2)}]`);
   }
 }
 
