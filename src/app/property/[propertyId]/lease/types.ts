@@ -14,3 +14,19 @@ export interface CreateTemplateResponse {
   templateId: string;
   signerEmail: string;
 }
+
+export interface Submission {
+  id: number;
+  apiSubmissionId: string;
+  email: string;
+  status: string;
+  role: string;
+  signerSlug: string;
+  propertyId: string;
+  signerId: string;
+  openedAt: string;
+  completedAt: string;
+  declinedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
