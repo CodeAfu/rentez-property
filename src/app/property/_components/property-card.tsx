@@ -30,7 +30,7 @@ export function PropertyCard({ property }: { property: Property }) {
           <div className="text-sm text-muted-foreground mb-2">
             {property.address}, {property.city}, {property.state}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {property.description.length > 120
               ? property.description.slice(0, 120) + "…"
               : property.description}
