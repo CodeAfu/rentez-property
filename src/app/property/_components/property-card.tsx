@@ -21,7 +21,7 @@ export function PropertyCard({ property }: { property: Property }) {
         />
       </div>
 
-      <CardContent className="space-y-3">
+      <CardContent className="flex-1 grid grid-rows-[1fr_auto] gap-4">
         <div>
           <CardTitle className="mb-1">{property.title}</CardTitle>
           <CardDescription className="mb-2 text-sm text-muted-foreground">
@@ -30,7 +30,7 @@ export function PropertyCard({ property }: { property: Property }) {
           <div className="text-sm text-muted-foreground mb-2">
             {property.address}, {property.city}, {property.state}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {property.description.length > 120
               ? property.description.slice(0, 120) + "…"
               : property.description}

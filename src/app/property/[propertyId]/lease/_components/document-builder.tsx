@@ -9,6 +9,10 @@ import { cn, devLog, logApiErr } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CreateTemplateResponse, SaveTemplateResponse } from "../types";
 import { Button } from "@/components/ui/button";
+import axios, { isAxiosError } from "axios";
+import { useToast } from "@/providers/toast-provider";
+import { useCallback } from "react";
+import { ToastMessageType } from "@/types/toast";
 
 interface CreateSubmissionPayload {
   propertyId: string;
@@ -71,11 +75,16 @@ export default function DocumentBuilder({
   mode,
 }: DocumentBuilderProps) {
   const queryClient = useQueryClient()
+  const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const showToast = useCallback((title: string, message: string, type: ToastMessageType = "error") => {
+    toast({ title, message, type });
+  }, [toast]);
+
   const signerEmail = searchParams.get("signerEmail");
 
-  const { mutate: createMutation, isError: isCreateError, error: createError } = useMutation({
+  const { mutate: createMutation } = useMutation({
     mutationFn: (data) => handleCreateLease(data, propertyId, signerEmail),
     onSuccess: (response: CreateTemplateResponse) => {
       devLog("Created template", response.message);
@@ -83,20 +92,26 @@ export default function DocumentBuilder({
     },
     onError: (err) => {
       logApiErr(err);
+      if (isAxiosError(err)) {
+        showToast("Error", err.response?.data.message);
+      }
     }
   });
 
-  const { mutate: saveMutation, isError: isSaveError, error: saveError } = useMutation({
+  const { mutate: saveMutation } = useMutation({
     mutationFn: (data) => handleSaveChanges(data, propertyId, templateId!),
     onSuccess: (response: SaveTemplateResponse) => {
       devLog(response.message, response.data);
     },
     onError: (err) => {
       logApiErr(err);
+      if (isAxiosError(err)) {
+        showToast("Error", err.response?.data.message);
+      }
     }
   });
 
-  const { mutate: createSubmissionMutation, isPending: isSending, isError: isSendError, error: sendError } = useMutation({
+  const { mutate: createSubmissionMutation, isPending: isSending, isError: isSendError } = useMutation({
     mutationFn: async () => {
       if (!templateId) throw new Error("Template ID is missing. Please save the document first.");
       if (!data?.signerEmail) throw new Error("Signer Email is missing.");
@@ -116,6 +131,9 @@ export default function DocumentBuilder({
     },
     onError: (err) => {
       logApiErr(err);
+      if (isAxiosError(err)) {
+        showToast("Error", err.response?.data.message);
+      }
     }
   });
 
@@ -126,33 +144,35 @@ export default function DocumentBuilder({
 
   return (
     <div className="px-2">
-      <div className="bg-card px-4 py-2 border-b flex justify-between items-center">
-        <h2 className="font-semibold">Recipient: {signerEmail ?? "No sender email"}</h2>
-        <div className="flex gap-2">
-          {signerEmail && (
-            <Button
-              onClick={() => createSubmissionMutation()}
-              disabled={!templateId || !propertyId || isSending}
-              variant={isSendError ? "destructive" : "default"}
-            >
-              {isSending ? (
-                "Sending..."
-              ) : isSendError ? (
-                "Retry Send"
-              ) : (
-                "Send Email"
-              )}
-            </Button>
-          )}
+      {isError && axios.isAxiosError(error) && <div className="text-destructive">{error.response?.data.message}</div>}
+      {signerEmail && (
+        <div className="bg-card px-4 py-2 border-b flex justify-between items-center">
+          <div>
+            <h2 className="font-semibold">Recipient: {signerEmail ?? "No sender email"} {data && data.emailSent && <span>(Sent)</span>}</h2>
+          </div>
+          <div className="flex gap-2">
+            {signerEmail && (
+              <Button
+                onClick={() => createSubmissionMutation()}
+                disabled={!templateId || !propertyId || isSending || !data || data.emailSent}
+                variant={isSendError ? "destructive" : "default"}
+              >
+                {isSending ? (
+                  "Sending..."
+                ) : isSendError ? (
+                  "Retry Send"
+                ) : (
+                  "Send Email"
+                )}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
       <div className="h-[calc(100dvh-4rem)] overflow-y-scroll bg-slate-200">
         {isLoading && <LoadingSpinner text="Loading..." />}
         {!templateId && <LoadingSpinner text="Creating Template..." />}
-        {isError && <div className="text-red-500">{error.message}</div>}
-        {isCreateError && <div className="text-red-500">{createError.message}</div>}
-        {isSaveError && <div className="text-red-500">{saveError.message}</div>}
-        {isSendError && <div className="text-red-500">{sendError.message}</div>}
         {data && (
           <div className={cn("w-full h-full", !templateId && "hidden")}>
             <DocusealBuilder

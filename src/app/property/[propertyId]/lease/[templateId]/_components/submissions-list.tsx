@@ -32,7 +32,15 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
     return `${window.location.origin}/lease-submission/${sub.signerSlug}?propertyId=${sub.propertyId}`;
   }
 
-  const handleCopyLink = (sub: Submission) => {
+  const handleCopyEmail = (sub: Submission) => {
+    navigator.clipboard.writeText(sub.email);
+    toast({
+      title: "Copied to clipboard",
+      message: "Email copied to clipboard",
+    })
+  }
+
+  const handleCopyUrl = (sub: Submission) => {
     navigator.clipboard.writeText(getSignerLink(sub));
     toast({
       title: "Copied to clipboard",
@@ -42,41 +50,43 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
 
   return (
     <div className="px-2">
-      <div className="bg-card shadow p-4 max-w-6xl w-full h-fit rounded-lg">
+      <div className="bg-card shadow max-w-6xl w-full h-fit rounded-lg">
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <div className="flex flex-col">
-            <h1 className="text-xl font-semibold pb-2 mb-4 border-b">Submissions</h1>
+          <div className="flex flex-col py-4 pb-2">
+            <div className="px-4">
+              <h1 className="text-lg font-semibold">Status</h1>
+            </div>
 
             {!submissions || submissions.length === 0 ? (
-              <div className="text-gray-500 text-sm">No submissions yet.</div>
+              <div className="text-gray-500 text-sm px-4 py-2">No submissions yet.</div>
             ) : (
               <div className="space-y-2 text-sm p-2 rounded">
                 {submissions.map((sub => (
-                  <div key={sub.id} className="flex flex-col px-4 py-2 bg-popover rounded-xl shadow">
+                  <div key={sub.id} className="flex flex-col gap-2 px-4 py-2 bg-popover rounded-xl shadow">
                     <div className="flex items-center justify-between">
-                      <span>{sub.email}</span>
-                      <span className="text-[10px] text-secondary border border-secondary bg-secondary/10 px-2 py-1 rounded-xl">{sub.status}</span>
+                      <span onClick={() => handleCopyEmail(sub)} className="cursor-pointer hover:underline underline-offset-1">{sub.email}</span>
+                      <span className="text-[10px] text-secondary border border-secondary bg-secondary/10 px-2 py-1 rounded-xl pointer-events-none select-none">{sub.status}</span>
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" title="View Submission">
-                        <Eye className="h-4 w-4" />
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="group size-6 hover:bg-muted hover:text-foreground hover:cursor-pointer" title="View Submission">
+                        <Eye className="h-4 w-4 group-hover:scale-115 transition duration-200" />
                       </Button>
-                      <Button variant="ghost" size="icon" title="Edit">
-                        <Pencil className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="group size-6 hover:bg-muted hover:text-foreground hover:cursor-pointer" title="Edit">
+                        <Pencil className="h-4 w-4 group-hover:scale-115 transition duration-200" />
                       </Button>
-                      <Button variant="ghost" size="icon" title="Copy Link" onClick={() => handleCopyLink(sub)}>
-                        <Link className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" className="group size-6 hover:bg-muted hover:text-foreground hover:cursor-pointer" title="Copy Link" onClick={() => handleCopyUrl(sub)}>
+                        <Link className="h-4 w-4 group-hover:scale-115 transition duration-200" />
                       </Button>
                     </div>
                   </div>
                 )))}
               </div>
             )}
-          </div >
+          </div>
         )}
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
