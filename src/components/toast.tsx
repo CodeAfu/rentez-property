@@ -26,7 +26,8 @@ export default function Toast({
   return (
     <div
       className={cn(
-        "relative md:w-sm w-64 opacity-90 font-mono bg-secondary text-secondary-foreground stroke-secondary-foreground shadow-lg p-2 rounded text-sm flex gap-2",
+        "relative md:w-sm w-64 opacity-90 text-xs font-mono bg-secondary text-secondary-foreground stroke-secondary-foreground shadow-lg p-2 rounded flex gap-2",
+        type === "error" && "text-destructive-foreground bg-destructive stroke-destructive-foreground",
         isExiting ? "animate-toast-exit" : "animate-toast-enter",
         className
       )}

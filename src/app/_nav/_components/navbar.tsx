@@ -36,13 +36,14 @@ export default function Navbar() {
   return (
     <nav className="sticky flex items-center justify-between h-16 bg-card shadow-sm overflow-hidden">
       <div className="flex h-full items-center">
-        <Link href="/" className="px-4 flex">
-          <Image
+        <Link href="/" className="block mx-4 w-[30px] h-[30px]">
+          <img
             src="/assets/rentez-logo.svg"
             alt="logo"
             width={30}
             height={30}
-            className="shrink-0 w-[30px] h-[30px]"
+            // ensure the image fills the container
+            className="w-full h-full object-contain"
           />
         </Link>
 
