@@ -74,9 +74,9 @@ export default function SubmissionsList({ propertyId, templateId }: SubmissionsL
                 )))}
               </div>
             )}
-          </div >
+          </div>
         )}
-      </div >
-    </div >
+      </div>
+    </div>
   );
 }
