@@ -1,6 +1,5 @@
 'use client'
 
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Polar } from "@polar-sh/sdk";
@@ -13,10 +12,8 @@ const polar = new Polar({
 });
 const ORGANIZATION_ID = "3e783099-3611-4627-99f5-45a61b2806b2"; 
 
-export default function CheckoutPage({propertyId}: {propertyId?: string}) {
-    const params = useParams();
+export default function CheckoutPage({propertyId, route}: {propertyId: string, route: string}) {
     const { toast } = useToast();
-    const property = params.propertyId as string;
     const [isLoading, setIsLoading] = useState(false);
 
     const createCheckoutSession = async () => {
@@ -31,7 +28,7 @@ export default function CheckoutPage({propertyId}: {propertyId?: string}) {
       let polarProductId: string | null = null;
             for await (const page of result) {
                 const matchingProduct = page.result.items.find(
-                    (product) => product.description === property
+                    (product) => product.description === propertyId
                 );
                 
                 if (matchingProduct) {
@@ -51,8 +48,9 @@ export default function CheckoutPage({propertyId}: {propertyId?: string}) {
             // Create checkout session
             const checkout = await polar.checkouts.create({
                 products: [polarProductId],
-                returnUrl: `${window.location.origin}/property/${property}/payment`,
-                successUrl: `${window.location.origin}/property/${property}`, // edit where ever you want it to lead to
+                returnUrl: `${window.location.origin}/property/${propertyId}`,
+                // edit where ever you want it to lead to
+                successUrl: `${window.location.origin}${route}`,
             });
 
             // console.log("Checkout Result Retrieved:", checkout.url);
@@ -81,13 +79,7 @@ export default function CheckoutPage({propertyId}: {propertyId?: string}) {
 
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="max-w-md w-full space-y-6 text-center">
-                <h1 className="text-3xl font-bold">Proceed to Payment</h1>
-                <p className="text-muted-foreground">
-                    Click the button below to proceed with your property rental payment.
-                </p>
-                <Button 
+            <Button 
                     onClick={createCheckoutSession} 
                     disabled={isLoading}
                     size="lg"
@@ -101,8 +93,6 @@ export default function CheckoutPage({propertyId}: {propertyId?: string}) {
                         "Proceed to Checkout"
                     )}
                 </Button>
-            </div>
-        </div>
-    )
 
+    )
 }
