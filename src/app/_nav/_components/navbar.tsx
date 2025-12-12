@@ -1,7 +1,6 @@
 import { Routes } from "@/types/navigation";
 import Auth from "@/app/auth/_components/auth";
 import NavButton from "./nav-button";
-import Image from "next/image";
 import Link from "next/link";
 import { Particles } from "@/components/ui/particles";
 

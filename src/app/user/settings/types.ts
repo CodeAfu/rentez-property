@@ -19,3 +19,14 @@ export const editUserSchema = z.object({
 });
 
 export type EditUserRequest = z.infer<typeof editUserSchema>;
+
+export interface PropertyApplication {
+  id: string;
+  propertyId: string;
+  propertyTitle: string;
+  propertyAddress: string;
+  applicantUserId: string;
+  applicantName: string;
+  applicantEmail: string;
+  createdAt: string;
+}
