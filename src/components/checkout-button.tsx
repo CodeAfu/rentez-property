@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Polar } from "@polar-sh/sdk";
 import { useToast } from "@/providers/toast-provider";
-import LoadingSpinner from "@/components/loading-spinner";
+import { devLog } from "@/lib/utils";
 
 const polar = new Polar({
   server: 'sandbox',
@@ -12,7 +12,7 @@ const polar = new Polar({
 });
 const ORGANIZATION_ID = "3e783099-3611-4627-99f5-45a61b2806b2";
 
-export default function CheckoutPage({ propertyId, route }: { propertyId: string, route: string }) {
+export default function CheckoutButton({ propertyId, route }: { propertyId: string, route: string }) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,12 +53,12 @@ export default function CheckoutPage({ propertyId, route }: { propertyId: string
         successUrl: `${window.location.origin}${route}`,
       });
 
-      // console.log("Checkout Result Retrieved:", checkout.url);
-      // console.log("Checkout Session Created:", checkout);
+      devLog("Checkout Result Retrieved:", checkout.url);
+      devLog("Checkout Session Created:", checkout);
 
       // Redirect to checkout URL
       if (checkout.url) {
-        // console.log("Redirecting to Checkout URL:", checkout.successUrl);
+        devLog("Redirecting to Checkout URL:", checkout.successUrl);
         window.location.href = checkout.url;
       } else {
         toast({
@@ -77,22 +77,16 @@ export default function CheckoutPage({ propertyId, route }: { propertyId: string
     }
   }
 
-
   return (
     <Button
       onClick={createCheckoutSession}
       disabled={isLoading}
-      size="lg"
-      className="w-full"
     >
       {isLoading ? (
-        <>
-          <LoadingSpinner /> Processing...
-        </>
+        "Processing..."
       ) : (
         "Proceed to Checkout"
       )}
     </Button>
-
   )
 }
