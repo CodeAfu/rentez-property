@@ -36,6 +36,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { withAuth } from "@/lib/auth";
 
+import { Polar } from "@polar-sh/sdk";
+
+
 const formSchema = z.object({
   title: z
     .string()
@@ -73,6 +76,17 @@ const races = ["Malay", "Chinese", "Indian", "Others", "Any"];
 const occupations = ["Student", "Working Professional", "Any"];
 const leaseTerms = ["Short Term", "Long Term", "Flexible"];
 
+// beta
+// polar_oat_jkL2y0i2KjOncZ2EbvUuFM6IRiIUGwUdLxG6s3SDjoI
+
+// Production
+// polar_oat_j0dxObk0iwDhframVzd1AjFosNpLh5Tgutmp60Ux6j6
+
+const polar = new Polar({
+  server: 'sandbox',
+  accessToken: "polar_oat_20l4c37dL9dnKTrerUQYCB0jZehVItCem6Du83q1oD7",
+});
+
 export default function CreateListing() {
   const queryClient = useQueryClient();
   const [, setImages] = useState<File[]>([]);
@@ -89,6 +103,7 @@ export default function CreateListing() {
       console.log("API Payload:", payload);
       const response = await api.post("/api/Property", payload);
       console.log("API Response:", response.data);
+      polarUpload(response.data)
       return response.data;
     }),
     onSuccess: () => {
@@ -221,11 +236,27 @@ export default function CreateListing() {
     };
 
     console.log("Submitting Payload:", payload);
+    
 
     // need to add deposit field in the backend only true or false field is there.
     createPropertyMutation.mutate(payload);
     queryClient.invalidateQueries({ queryKey: ["property"] });
   };
+
+  const polarUpload = async (propertyData) => {
+  await polar.products.create({
+    name: propertyData.title,
+    prices: [
+      {
+        amountType: "fixed",
+        priceAmount: Number(propertyData.rent),
+        priceCurrency: "usd",
+      },
+    ],
+    description: propertyData.id,
+  });
+};
+
 
   if (isAuthenticating) return <LoadingSpinner />;
 

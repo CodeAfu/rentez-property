@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -15,6 +16,14 @@ export default function HeroSection() {
           Search for Property
         </Button>
         <Button size="lg">Rent a Room</Button>
+      </div>
+      <div>
+        Stripe Payment Integration Coming Soon! <br/>
+        <Button asChild >
+          <Link href="/testing_payment" >
+            Testing Payment Page
+          </Link>
+        </Button>
       </div>
     </div>
   );

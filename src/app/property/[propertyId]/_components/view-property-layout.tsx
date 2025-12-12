@@ -19,6 +19,7 @@ import api from "@/lib/api";
 import { withAuth } from "@/lib/auth";
 import { useToast } from "@/providers/toast-provider";
 import axios from "axios";
+import Link from "next/link";
 
 interface ViewPropertyLayoutProps {
   propertyId: string;
@@ -208,6 +209,9 @@ export default function ViewPropertyLayout({
               size="lg"
             >
               {applyPropertyMutation.isPending ? "Submitting..." : "Rent this Property"}
+            </Button>
+            <Button asChild>
+              <Link href={`/property/${propertyId}/payment`}>payment</Link>
             </Button>
           </div>
         </div>
