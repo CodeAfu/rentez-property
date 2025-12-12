@@ -38,6 +38,11 @@ import { withAuth } from "@/lib/auth";
 
 import { Polar } from "@polar-sh/sdk";
 
+interface PolarUploadRequest {
+  id: string;
+  title: string;
+  rent: string;
+}
 
 const formSchema = z.object({
   title: z
@@ -236,26 +241,26 @@ export default function CreateListing() {
     };
 
     console.log("Submitting Payload:", payload);
-    
+
 
     // need to add deposit field in the backend only true or false field is there.
     createPropertyMutation.mutate(payload);
     queryClient.invalidateQueries({ queryKey: ["property"] });
   };
 
-  const polarUpload = async (propertyData) => {
-  await polar.products.create({
-    name: propertyData.title,
-    prices: [
-      {
-        amountType: "fixed",
-        priceAmount: Number(propertyData.rent),
-        priceCurrency: "usd",
-      },
-    ],
-    description: propertyData.id,
-  });
-};
+  const polarUpload = async (propertyData: PolarUploadRequest) => {
+    await polar.products.create({
+      name: propertyData.title,
+      prices: [
+        {
+          amountType: "fixed",
+          priceAmount: Number(propertyData.rent),
+          priceCurrency: "usd",
+        },
+      ],
+      description: propertyData.id,
+    });
+  };
 
 
   if (isAuthenticating) return <LoadingSpinner />;

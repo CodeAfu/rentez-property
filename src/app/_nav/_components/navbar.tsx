@@ -3,6 +3,7 @@ import Auth from "@/app/auth/_components/auth";
 import NavButton from "./nav-button";
 import Image from "next/image";
 import Link from "next/link";
+import { Particles } from "@/components/ui/particles";
 
 const routes: Routes = [
   {
@@ -33,8 +34,19 @@ export default function Navbar() {
   const visibleRoutes = routes.filter(
     (route) => !route.devOnly || process.env.NODE_ENV === "development",
   );
+
   return (
-    <nav className="sticky flex items-center justify-between h-16 bg-card shadow-sm overflow-hidden">
+    <nav className="sticky relative flex items-center justify-between h-16 bg-card/70 backdrop-blur-sm shadow-sm overflow-hidden">
+      {/* Navbar-only background particles (non-interactive, behind content) */}
+      <Particles
+        className="absolute inset-0 -z-10 pointer-events-none"
+        color="muted"
+        quantity={40}
+        size={0.6}
+        vx={0.1}
+        vy={0.1}
+      />
+
       <div className="flex h-full items-center">
         <Link href="/" className="block mx-4 w-[30px] h-[30px]">
           <img
