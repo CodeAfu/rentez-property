@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Button } from "@/components/ui/button";
 import LiquidEtherClient from "@/components/LiquidEtherClient";
 
@@ -15,7 +14,7 @@ export default function HeroSection() {
         autoSpeed={0.5}
         autoIntensity={1.8}
         cursorSize={140}
-      />  
+      />
 
       {/* Foreground content above the background */}
       <div className="absolute z-10 w-full flex flex-col items-center justify-center">
@@ -29,14 +28,6 @@ export default function HeroSection() {
           </Button>
           <Button size="lg">Rent a Room</Button>
         </div>
-      </div>
-      <div>
-        Stripe Payment Integration Coming Soon! <br/>
-        <Button asChild >
-          <Link href="/testing_payment" >
-            Testing Payment Page
-          </Link>
-        </Button>
       </div>
     </div>
   );

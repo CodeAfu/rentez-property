@@ -137,7 +137,7 @@ export default function DocumentSigner({ slug }: DocumentViewProps) {
     enabled: !!propertyId,
   });
 
-  const { data: submitterData } = useQuery({
+  const { } = useQuery({
     queryKey: ["docuseal", "submissions", submitterEmail, propertyId],
     queryFn: async () => {
       const submission = await getSubmission(submitterEmail!, propertyId!);
