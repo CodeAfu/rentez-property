@@ -59,7 +59,7 @@ export const withAuth = <T extends unknown[], R>(
       token = await refreshAccessToken();
     } catch {
       localStorage.removeItem("accessToken");
-      window.location.href = "/auth/login";
+      // window.location.href = "/auth/login";
       throw new Error("Session expired. Please login again");
     }
 
