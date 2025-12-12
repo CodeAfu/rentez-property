@@ -37,7 +37,7 @@ export function PropertyFilters({ values, onUpdate }: FilterProps) {
   };
 
   return (
-    <div className="space-y-6 border-r pr-6 w-full md:w-64 shrink-0">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
       {/* State Filter */}
       <div className="space-y-2">
         <Label>State</Label>
@@ -65,7 +65,6 @@ export function PropertyFilters({ values, onUpdate }: FilterProps) {
         <Input
           placeholder="e.g. Cyberjaya"
           defaultValue={values.city}
-          // Debounce handled by parent or useDebouncedCallback here
           onChange={(e) => onUpdate("city", e.target.value || null)}
         />
       </div>
@@ -90,9 +89,9 @@ export function PropertyFilters({ values, onUpdate }: FilterProps) {
       </div>
 
       {/* Room Types (Multi-select) */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Label>Room Types</Label>
-        <div className="space-y-2">
+        <div className="flex flex-wrap gap-3">
           {ROOM_TYPES.map((type) => (
             <div key={type} className="flex items-center space-x-2">
               <Checkbox

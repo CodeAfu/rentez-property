@@ -11,6 +11,7 @@ import z from "zod";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { PropertyFilters } from "./property-filters";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 // 1. Schema Definition
 const searchSchema = z.object({
@@ -53,6 +54,7 @@ export default function SearchClient() {
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || "",
   );
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Sync local state if URL changes externally (e.g. back button)
   useEffect(() => {
@@ -107,17 +109,19 @@ export default function SearchClient() {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Left Sidebar: Filters */}
-        <aside className="hidden md:block">
-          <PropertyFilters values={parsedQuery} onUpdate={updateUrl} />
-        </aside>
-
-        {/* Right Content */}
-        <div className="flex-1">
-          {/* Top Bar: Search Input & Button */}
-          <div className="flex items-center flex-1 gap-8 mb-6">
-            <div className="flex w-full gap-2">
+      <div className="flex flex-col gap-8">
+        {/* Top Bar: Hamburger Menu, Search Input & Button */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="shrink-0"
+            >
+              {isFilterOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+            <div className="flex flex-1 gap-2">
               <Input
                 placeholder="Search properties by location, name..."
                 value={searchTerm}
@@ -125,19 +129,32 @@ export default function SearchClient() {
                 onKeyDown={(e) =>
                   e.key === "Enter" && updateUrl("search", searchTerm)
                 }
-                className="max-w-lg"
+                className="flex-1"
               />
               <Button onClick={() => updateUrl("search", searchTerm)}>
                 Search
               </Button>
             </div>
-            <Button asChild variant="secondary">
+            <Button asChild variant="secondary" className="shrink-0">
               <Link href="/property/create">Add Listing</Link>
             </Button>
           </div>
 
-          {/* Results Grid */}
-          <div className="mt-4">
+          {/* Collapsible Filters */}
+          <div 
+            className={`
+              overflow-hidden transition-all duration-300 ease-in-out
+              ${isFilterOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}
+            `}
+          >
+            <div className="border rounded-lg p-6 bg-card shadow-sm">
+              <PropertyFilters values={parsedQuery} onUpdate={updateUrl} />
+            </div>
+          </div>
+        </div>
+
+        {/* Results Grid */}
+        <div>
             {isLoading && !data ? (
               <div className="py-10 text-center text-muted-foreground">
                 Loading properties...
@@ -192,7 +209,6 @@ export default function SearchClient() {
                 )}
               </div>
             )}
-          </div>
         </div>
       </div>
     </div>
