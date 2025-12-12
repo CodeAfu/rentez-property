@@ -72,16 +72,16 @@ export default function Overview() {
     resolver: zodResolver(editUserSchema),
     values: userData?.data
       ? {
-          firstName: userData.data.firstName || "",
-          lastName: userData.data.lastName || "",
-          occupation: userData.data.occupation || "",
-          ethnicity: userData.data.ethnicity || "",
-          dateOfBirth:
-            userData.data.dateOfBirth &&
+        firstName: userData.data.firstName || "",
+        lastName: userData.data.lastName || "",
+        occupation: userData.data.occupation || "",
+        ethnicity: userData.data.ethnicity || "",
+        dateOfBirth:
+          userData.data.dateOfBirth &&
             userData.data.dateOfBirth !== NULL_DATE_ENTRY
-              ? userData.data.dateOfBirth.split("T")[0]
-              : "",
-        }
+            ? userData.data.dateOfBirth.split("T")[0]
+            : "",
+      }
       : undefined,
   });
 
@@ -197,9 +197,6 @@ export default function Overview() {
           </div>
         )}
       </form>
-      <p className="text-xs font-light text-gray-900 pt-4">
-        {devOut(JSON.stringify(userData.data, null, 2))}
-      </p>
     </section>
   );
 }

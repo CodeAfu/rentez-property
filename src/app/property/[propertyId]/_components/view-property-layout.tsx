@@ -210,9 +210,6 @@ export default function ViewPropertyLayout({
             >
               {applyPropertyMutation.isPending ? "Submitting..." : "Rent this Property"}
             </Button>
-            <Button asChild>
-              <Link href={`/property/${propertyId}/payment`}>payment</Link>
-            </Button>
           </div>
         </div>
       </div>
