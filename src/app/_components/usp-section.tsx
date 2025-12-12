@@ -1,135 +1,111 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ShieldCheck, Zap, FileSignature, Headset } from "lucide-react";
+import {
+  ShieldCheck,
+  FileSignature,
+  Headset,
+  Zap,
+  MousePointer2,
+} from "lucide-react";
+import DotPattern from "@/components/DotPattern";
 
-/* ----------------------------------------------------
-   Spotlight Card
----------------------------------------------------- */
-const SpotlightCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
-
-  const onMove = (e: { clientX: number; clientY: number; }) => {
-    if (!divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  return (
-    <div
-      ref={divRef}
-      onMouseMove={onMove}
-      onMouseEnter={() => setOpacity(1)}
-      onMouseLeave={() => setOpacity(0)}
-      className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md ${className}`}
-    >
-      <div
-        className="absolute -inset-px pointer-events-none transition duration-300"
-        style={{
-          opacity,
-          background: `radial-gradient(450px circle at ${pos.x}px ${pos.y}px, rgba(59,130,246,0.12), transparent 40%)`
-        }}
-      />
-      <div className="relative">{children}</div>
-    </div>
-  );
-};
-
-/* ----------------------------------------------------
-   Background Dot Pattern
----------------------------------------------------- */
-const DotPattern = () => (
-  <svg
-    className="absolute inset-0 -z-10 w-full h-full stroke-slate-200 [mask-image:radial-gradient(100%_100%_at_top_center,white,transparent)]"
-    aria-hidden="true"
-  >
-    <defs>
-      <pattern id="dots" width={20} height={20} patternUnits="userSpaceOnUse">
-        <circle cx={2} cy={2} r={1} className="fill-slate-300" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#dots)" strokeWidth={0} />
-  </svg>
-);
-
-/* ----------------------------------------------------
-   Main Component (Matches Screenshot)
----------------------------------------------------- */
 export default function USPSection() {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-120px" });
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-150px",
+  });
 
   const features = [
     {
       icon: ShieldCheck,
-      title: "Instant Booking",
-      desc: "Instant booking with verified assessments and secure processes.",
-      color: "bg-blue-100 text-blue-600"
-    },
-    {
-      icon: FileSignature,
-      title: "Verified Landlords",
-      desc: "Every landlord is verified to ensure trust and transparency.",
-      color: "bg-emerald-100 text-emerald-600"
+      title: "Verified Owners",
+      desc: "Every landlord is verified so you can rent confidently with real, legitimate listings.",
+      bg: "bg-blue-100",
+      color: "text-blue-600",
     },
     {
       icon: Zap,
-      title: "Tenant Community",
-      desc: "Enjoy community features that help connect owners and tenants.",
-      color: "bg-amber-100 text-amber-600"
+      title: "Instant Booking",
+      desc: "See a place you like? Secure the room instantly without waiting for approval.",
+      bg: "bg-amber-100",
+      color: "text-amber-600",
+    },
+    {
+      icon: FileSignature,
+      title: "Digital Contracts",
+      desc: "Sign contracts digitally right within the platform. No printing or scanning needed.",
+      bg: "bg-emerald-100",
+      color: "text-emerald-600",
     },
     {
       icon: Headset,
-      title: "Easy App Management",
-      desc: "Manage your bookings smoothly with user friendly tools.",
-      color: "bg-purple-100 text-purple-600"
-    }
+      title: "24/7 Support",
+      desc: "Issues with your stay? Our support team is available anytime you need help.",
+      bg: "bg-purple-100",
+      color: "text-purple-600",
+    },
   ];
 
   return (
-    <section ref={ref} className="relative py-20 bg-white">
+    <section ref={ref} className="relative pt-10 pb-18 bg-white overflow-hidden">
       <DotPattern />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Heading */}
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-            Why Choose RentEZ
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-14"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 font-serif tracking-tight mb-5">
+            Why Choose RentEZ?
           </h2>
-          <p className="text-slate-600 text-base max-w-2xl mx-auto">
-            Enjoy a trusted, secure, and seamless rental experience built for modern renters and landlords.
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
+            We designed RentEZ to remove stress from renting and to make the
+            whole process safer, simpler, and more transparent.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Grid Cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((f, idx) => (
+        {/* Grid features */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.45, delay: idx * 0.1 }}
+              className="h-full"
             >
-              <SpotlightCard>
-                <div className="p-6 flex flex-col items-center text-center space-y-4">
+              <div className="h-full group border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all bg-white">
+                <div className="p-8 flex flex-col h-full">
+                  {/* Icon */}
                   <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center ${f.color}`}
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 ${feature.bg} ${feature.color}`}
                   >
-                    <f.icon className="w-7 h-7" />
+                    <feature.icon className="w-7 h-7" />
                   </div>
 
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    {f.title}
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
+                    {feature.title}
                   </h3>
 
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {f.desc}
+                  {/* Description */}
+                  <p className="text-slate-600 text-sm leading-relaxed grow">
+                    {feature.desc}
                   </p>
+
+                  {/* Learn More */}
+                  <div className="mt-6 flex items-center text-sm font-semibold text-slate-400 group-hover:text-blue-600 transition-colors">
+                    Learn more
+                    <MousePointer2 className="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                  </div>
                 </div>
-              </SpotlightCard>
+              </div>
             </motion.div>
           ))}
         </div>

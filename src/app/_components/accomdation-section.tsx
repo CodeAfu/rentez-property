@@ -12,7 +12,7 @@ export default function AccommodationTypesSection() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="pt-16 pb-16 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-4xl font-bold text-center mb-16">Types of Accommodation for Rent</h2>
 
@@ -32,7 +32,7 @@ export default function AccommodationTypesSection() {
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.6 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
               <div className="absolute bottom-0 p-6">
                 <t.icon className="w-8 h-8 text-white mb-2" />
                 <h3 className="text-2xl font-bold text-white">{t.name}</h3>
