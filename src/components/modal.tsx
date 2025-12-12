@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, {
+import {
   Dispatch,
   Fragment,
   HTMLAttributes,

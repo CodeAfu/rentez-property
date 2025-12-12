@@ -7,6 +7,15 @@ export interface CompleteSubmissionResponse {
   completed_at: string;
 }
 
+export interface DocusealFormLoadData {
+  completed_submitter?: {
+    id: number;
+    submission_id: number;
+    email: string;
+    name: string | null;
+    completed_at: string;
+  };
+}
 //
 // [
 //   {
