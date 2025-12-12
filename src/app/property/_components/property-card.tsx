@@ -7,13 +7,22 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/types/property";
+import { ShineBorder } from "@/components/ui/shine-border";
 
 export function PropertyCard({ property }: { property: Property }) {
   const cover = property.images?.[0] || "/placeholder.jpg";
 
   return (
-    <Card className="overflow-hidden transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg">
-      <div className="relative flex items-center justify-center w-full aspect-16/10 bg-muted">
+    <Card className="group relative overflow-hidden transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg">
+      {/* Shine border overlay (absolute) */}
+      <ShineBorder
+        borderWidth={3}
+        duration={12}
+        shineColor={["var(--primary)", "var(--secondary)"]}
+        className="rounded-xl z-10 hidden group-hover:block transition duration-500"
+      />
+
+      <div className="relative flex items-center justify-center w-full bg-muted aspect-16/10 ">
         <img
           src={cover}
           alt={property.title}
