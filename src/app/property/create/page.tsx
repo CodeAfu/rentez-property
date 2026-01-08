@@ -35,6 +35,7 @@ import api from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { withAuth } from "@/lib/auth";
+import { uploadMultipleImagesToS3 } from "@/lib/s3-upload";
 
 import { Polar } from "@polar-sh/sdk";
 
@@ -94,9 +95,10 @@ const polar = new Polar({
 
 export default function CreateListing() {
   const queryClient = useQueryClient();
-  const [, setImages] = useState<File[]>([]);
+  const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
 
   const { isAuthenticating, isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -105,9 +107,9 @@ export default function CreateListing() {
 
   const createPropertyMutation = useMutation({
     mutationFn: withAuth(async (payload: FormValues) => {
-      console.log("API Payload:", payload);
+      // console.log("API Payload:", payload);
       const response = await api.post("/api/Property", payload);
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
       polarUpload(response.data)
       return response.data;
     }),
@@ -191,6 +193,8 @@ export default function CreateListing() {
   };
 
   const removeImage = (index: number) => {
+    // Revoke object URL to prevent memory leaks
+    URL.revokeObjectURL(imagePreviews[index]);
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -206,46 +210,67 @@ export default function CreateListing() {
     handleImageUpload(e.dataTransfer.files);
   };
 
-  const onSubmit = (data: FormValues) => {
-    const payload = {
-      title: data.title,
-      description: data.description,
-      address: data.address,
-      city: data.city,
-      state: data.state,
-      rent: Number(data.rent), // Ensure number
-      // Send Base64 strings array
-      images: imagePreviews,
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsUploadingImages(true);
+      
+      // Upload images to S3 if any exist
+      let imageUrls: string[] = [];
+      if (images.length > 0) {
+        toast({
+          title: "Uploading images...",
+          message: `Uploading ${images.length} image(s) to storage`,
+        });
+        
+        imageUrls = await uploadMultipleImagesToS3(images);
+        
+        toast({
+          title: "Images uploaded!",
+          message: "Creating property listing...",
+        });
+      }
 
-      // Handle deposit (ensure null if 0 or empty, or send number)
-      deposit: data.deposit
-        ? Number(data.deposit)
-        : null,
+      const payload = {
+        title: data.title,
+        description: data.description,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        rent: Number(data.rent),
+        // Send S3 URLs instead of Base64 strings
+        images: imageUrls,
 
-      depositRequired: data.deposit && Number(data.deposit) > 0 ? true : false,
+        deposit: data.deposit ? Number(data.deposit) : null,
+        depositRequired: data.deposit && Number(data.deposit) > 0 ? true : false,
 
-      billsIncluded: {
-        wifi: data.billsIncluded.wifi ?? false,
-        electricity: data.billsIncluded.electricity ?? false,
-        water: data.billsIncluded.water ?? false,
-        gas: data.billsIncluded.gas ?? false,
-      },
+        billsIncluded: {
+          wifi: data.billsIncluded.wifi ?? false,
+          electricity: data.billsIncluded.electricity ?? false,
+          water: data.billsIncluded.water ?? false,
+          gas: data.billsIncluded.gas ?? false,
+        },
 
-      leaseAgreementId: null,
+        leaseAgreementId: null,
 
-      // Arrays
-      roomType: data.roomType,
-      preferredRaces: data.preferredRaces,
-      preferredOccupation: data.preferredOccupation,
-      leaseTermCategory: data.leaseTermCategory, // Ensure this matches backend expected strings
-    };
+        roomType: data.roomType,
+        preferredRaces: data.preferredRaces,
+        preferredOccupation: data.preferredOccupation,
+        leaseTermCategory: data.leaseTermCategory,
+      };
 
-    console.log("Submitting Payload:", payload);
+      console.log("Submitting Payload:", payload);
 
-
-    // need to add deposit field in the backend only true or false field is there.
-    createPropertyMutation.mutate(payload);
-    queryClient.invalidateQueries({ queryKey: ["property"] });
+      createPropertyMutation.mutate(payload);
+      queryClient.invalidateQueries({ queryKey: ["property"] });
+    } catch (error) {
+      toast({
+        title: "Image upload failed",
+        message: "Failed to upload images. Please try again.",
+      });
+      console.error("Image upload error:", error);
+    } finally {
+      setIsUploadingImages(false);
+    }
   };
 
   const polarUpload = async (propertyData: PolarUploadRequest) => {
@@ -671,9 +696,14 @@ export default function CreateListing() {
             <Button
               type="submit"
               size="lg"
+              disabled={isUploadingImages || createPropertyMutation.isPending}
               className="w-full h-14 text-lg font-semibold shadow-md hover:shadow-lg transition-all"
             >
-              Publish Listing
+              {isUploadingImages
+                ? "Uploading images..."
+                : createPropertyMutation.isPending
+                ? "Creating listing..."
+                : "Publish Listing"}
             </Button>
           </motion.div>
         </form>
