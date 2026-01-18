@@ -3,6 +3,7 @@ export interface NavLink {
   href: string;
   dropdown?: NavLink[];
   devOnly?: boolean;
+  adminOnly?: boolean;
 }
 
 export type Routes = NavLink[];

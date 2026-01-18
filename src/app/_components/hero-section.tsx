@@ -16,7 +16,7 @@ export default function HeroSection() {
         cursorSize={140}
       />
 
-      <div className="absolute z-10 w-full flex flex-col items-center justify-center">
+      <div className="absolute w-full flex flex-col items-center justify-center">
         <h1 className="text-center font-bold sm:text-8xl text-6xl select-none mb-8 font-serif">
           RentEZ Property
         </h1>

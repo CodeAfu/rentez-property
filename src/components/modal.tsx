@@ -44,13 +44,13 @@ export default function Modal({
         <Fragment>
           <div
             onClick={() => onOpenChange(false)}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm opacity-0 animate-[fadeIn_150ms_ease-out_forwards]"
+            className="fixed z-99 inset-0 bg-black/30 backdrop-blur-sm opacity-0 animate-[fadeIn_150ms_ease-out_forwards]"
             data-modal-content
           />
           <div
             id="modal-body"
             className={cn(
-              "fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] bg-card min-h-32 text-card-foreground flex flex-col rounded shadow w-full max-w-xl",
+              "fixed z-100 top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] bg-card min-h-32 text-card-foreground flex flex-col rounded shadow w-full max-w-xl",
               "opacity-0 animate-[fadeIn_150ms_ease-out_forwards]",
               className
             )}

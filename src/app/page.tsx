@@ -15,11 +15,11 @@ export default function Home() {
             <HeroSection />
           </div>
         </div>
-      <MetricsSection />
-      <AccommodationTypesSection /> 
-      <USPSection />     
-      <TestimonialsSection />
-      <LandlordCTASection />
+        <MetricsSection />
+        <AccommodationTypesSection />
+        <USPSection />
+        <TestimonialsSection />
+        <LandlordCTASection />
       </div>
     </main>
   );

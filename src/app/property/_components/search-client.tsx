@@ -141,7 +141,7 @@ export default function SearchClient() {
           </div>
 
           {/* Collapsible Filters */}
-          <div 
+          <div
             className={`
               overflow-hidden transition-all duration-300 ease-in-out
               ${isFilterOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}
@@ -155,60 +155,60 @@ export default function SearchClient() {
 
         {/* Results Grid */}
         <div>
-            {isLoading && !data ? (
-              <div className="py-10 text-center text-muted-foreground">
-                Loading properties...
-              </div>
-            ) : properties.length === 0 ? (
-              <div className="py-10 text-center text-muted-foreground">
-                No properties match your search.
-              </div>
-            ) : (
-              <div>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  Showing {properties.length} results (Page{" "}
-                  {pagination?.pageNum})
-                </p>
+          {isLoading && !data ? (
+            <div className="py-10 text-center text-muted-foreground">
+              Loading properties...
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="py-10 text-center text-muted-foreground">
+              No properties match your search.
+            </div>
+          ) : (
+            <div>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Showing {properties.length} results (Page{" "}
+                {pagination?.pageNum})
+              </p>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {properties.map((p) => (
-                    <PropertyCard key={p.id} property={p} />
-                  ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {properties.map((p) => (
+                  <PropertyCard key={p.id} property={p} />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {pagination && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    disabled={
+                      !pagination.hasPreviousPage || isPlaceholderData
+                    }
+                    onClick={() =>
+                      updateUrl("pageNum", pagination.pageNum - 1)
+                    }
+                  >
+                    Previous
+                  </Button>
+
+                  <span className="text-sm mx-2">
+                    Page {pagination.pageNum} of{" "}
+                    {Math.ceil(pagination.totalCount / pagination.pageSize)}
+                  </span>
+
+                  <Button
+                    variant="outline"
+                    disabled={!pagination.hasNextPage || isPlaceholderData}
+                    onClick={() =>
+                      updateUrl("pageNum", pagination.pageNum + 1)
+                    }
+                  >
+                    Next
+                  </Button>
                 </div>
-
-                {/* Pagination Controls */}
-                {pagination && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
-                    <Button
-                      variant="outline"
-                      disabled={
-                        !pagination.hasPreviousPage || isPlaceholderData
-                      }
-                      onClick={() =>
-                        updateUrl("pageNum", pagination.pageNum - 1)
-                      }
-                    >
-                      Previous
-                    </Button>
-
-                    <span className="text-sm mx-2">
-                      Page {pagination.pageNum} of{" "}
-                      {Math.ceil(pagination.totalCount / pagination.pageSize)}
-                    </span>
-
-                    <Button
-                      variant="outline"
-                      disabled={!pagination.hasNextPage || isPlaceholderData}
-                      onClick={() =>
-                        updateUrl("pageNum", pagination.pageNum + 1)
-                      }
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

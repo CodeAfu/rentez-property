@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,14 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/providers/auth-provider';
-import { SettingsIcon, LogOutIcon, UserIcon } from 'lucide-react';
+import { SettingsIcon, LogOutIcon, UserIcon, Bell } from 'lucide-react';
 import Link from 'next/link';
+import NotificationConfirmationModal from './notification-confirmation-modal';
+import { useState } from 'react';
 
 interface ProfileProps {
   message?: string;
 }
 
 export default function Profile({ message = "User" }: ProfileProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const {
     logoutMutation: { mutate: logout },
   } = useAuth();
@@ -25,25 +30,33 @@ export default function Profile({ message = "User" }: ProfileProps) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="icon" variant="outline" className="size-10 mr-2 border-2 border-gray-300 bg-card rounded-full hover:cursor-pointer hover:scale-105 hover:bg-card hover:border-primary transition duration-200">
-          <UserIcon className="w-12 h-12 text-primary" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Welcome, <span className="text-primary font-semibold">{message}</span></DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <SettingsIcon className="w-4 h-4 mr-2" />
-          <Link href="/user/settings">
-            Settings
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout}>
-          <LogOutIcon className="w-4 h-4 mr-2" /> Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="outline" className="size-10 mr-2 border-2 border-gray-300 bg-card rounded-full hover:cursor-pointer hover:scale-105 hover:bg-card hover:border-primary transition duration-200">
+            <UserIcon className="w-12 h-12 text-primary" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-56">
+          <DropdownMenuLabel>Welcome, <span className="text-primary font-semibold">{message}</span></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <SettingsIcon className="w-4 h-4 mr-2" />
+            <Link href="/user/settings">
+              Settings
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="whitespace-nowrap" onClick={() => setIsOpen(true)}>
+            <Bell className="w-4 h-4 mr-2" /> Subscribe to Notifications
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOutIcon className="w-4 h-4 mr-2" /> Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <NotificationConfirmationModal isOpen={isOpen} onOpenChange={setIsOpen} />
+    </>
   );
 }
